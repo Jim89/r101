@@ -1,0 +1,740 @@
+---
+title: "R 101"
+subtitle: "An introduction to the R language for data manipulation"
+author: "" 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow   # 
+output: ioslides_presentation
+mode: selfcontained
+widescreen: true
+---
+# Introduction
+
+## Background
+
+Following the success of R the Knowledge Sharing Session last year, 
+we're back with an updated introduction to a number of new R tools and features.
+
+R is a widely used, open source language. It can be easily incorporated into 
+most client engagements. We aim to show you how.
+
+In this session, We'll discuss how you can start doing more of your 
+existing work in R. We'll also cover some of the newer and more exciting 
+features that R offers to help our analytics processes from end-to-end.
+
+## Isn't R just for stats?
+
+Simply put: no.
+
+Whilst R does have powerful statistical capabilities (in fact, more than other [languages](http://stanfordphd.com/Statistical_Software.html)) it's also [ranked highly](http://www.oreilly.com/data/free/2014-data-science-salary-survey.csp) (behind only SQL and Excel) as a general analytics tool. 
+
+It's also the 6^th^ most popular [programming language](http://blog.revolutionanalytics.com/2014/07/ieee-ranks-r-9-amongst-all-languages.html) in the world. Not bad.
+
+Statistical analysis using R will be discussed in another session. For now we will show you simple ways to start using R and how it can add value to the work we do for clients.
+
+## Why R?
+
+* Free
+
+<br>
+
+* Flexible
+
+<br>
+
+* Powerful
+
+<br>
+
+* Future-resistant
+
+## Why not R?
+
+* Open source is scary, right?
+
+<br>
+
+* There's no support!
+
+<br>
+
+* R can't handle "big" data!
+
+<br>
+
+* But seriously, how ways many are there to do this?!
+
+
+## Agenda
+
+Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment. We think it's the best way to use R, so We'll provide a brief overview of it before diving in to:
+
+* How R stores data;
+* How to read/write data with to R;
+* How to check and explore your data;
+* How to manipulate your data;
+* How to visualise your data; and
+* How to report on your data.
+
+# R Studio | A whistlestop tour
+
+## Layout
+<div class="columns-2">
+   ![rstudio](./resources/rstudio.png)
+
+   * Console (bottom left)
+   * Scripting/Source (top left)
+   * Environment (top right)
+   * Files, plots, help, packages (bottom right)
+</div>
+
+
+## Basic useR - typing at the console
+
+The console command line is an easy way to run any R command you can 
+think of. Try:
+
+```
+print("Hello world")
+
+2+2
+
+a <- 10
+a
+a * 3
+
+b <- 1:10
+b
+b + 2
+sum(b)
+```
+
+## Advanced useR - scripting
+
+The scripting environment in R functions just like a code window in SQL 
+Server Management Studio, a SAS program, or a Stata do-file.
+
+To create a new script, use Ctrl+Shift+N, click the "new script" icon in 
+the top left corner of R Studio or use File > New File > RScript.
+
+We recommend using scripts as they:
+
+1. Record your steps clearly; and
+2. Ensure you can replicate and modify your work easily.
+
+To run any commands from the scripting window, highlight them and use 
+Ctrl+Enter or click "Run" in the top right of the scripting area. This 
+is the equivalent of typing them in to the console.
+
+
+## The bits that aren't for typing
+
+* Top right
+     * Environment - shows all objects (i.e. data) currently loaded in 
+to R. More on this later.
+     * History - a list of recently executed R commands.
+
+* Bottom right
+     * Files - operates as a file browser, helping you navigate around 
+your file system.
+     * Plots - displays any plots you've made from an R script or from 
+the console.
+     * Packages - lists all the packages you've got installed/loaded. 
+     * Help - Displays information on all R functions, the options for 
+each one and examples of their usage.
+
+## Packages
+
+R packages are additions to the base R language. They add extra functionality that makes R one of the most flexible languages for data analysis out there - if there's something specific you'd like to do in R, the chances are there's a package for it. 
+
+Today we'll be discussing and using a number of packages that will help us get started with R.
+
+## Packages
+
+* [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) - data manipulation
+* [ggplot2](http://ggplot2.org/) - data visualisation
+* [tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) - data tidying
+* [magrittr](http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) - data pipelines
+* [RODBC](http://www.statmethods.net/input/dbinterface.html) - reading data from ODBC connections
+* [xlsx](http://cran.r-project.org/web/packages/xlsx/xlsx.pdf) - reading data from Excel
+* [foreign](http://cran.r-project.org/web/packages/foreign/foreign.pdf) - reading data from anywhere!
+* [rmarkdown + knitr](http://rmarkdown.rstudio.com/) - reporting from R
+
+The first 4 of these packages were created by [Hadley Wickham](http://had.co.nz/). His work is so prolific and popular that his approach to data analysis is known as the "hadleyverse" in the R community. He's also writing the most comprehensive [book](http://adv-r.had.co.nz/) on R out there.
+
+## Working youR way - how R manages your data
+
+R uses the concept of a working directory, essentially where on your file system your scripts and data are saved. A bit like a `libname` in SAS. To see where you're currently working run `getwd()`
+
+You can change where you're working using `setwd(path/to/project/files)` (note that you should use forward slash in file paths).
+
+R holds everything you're working on in a "workspace". This includes data you've loaded, functions you've written, outputs from statistical models and more. Essentially it's everything you'll ever see in the "Environment" area in the top right.
+
+You can save your environment for later using ```save.image()``` and bring it back with ```load()```. We don't necessarily recommend this, though.
+
+
+# A quick aside | Getting help
+
+## *Where* to ask for help
+
+The great thing about an open source language is its community. Luckily, 
+R is no exception and there are a wealth of options for getting help:
+
+1. R help files: `?mean`, `?iris`
+2. R package vignettes - can see those available with `vignette()`
+3. [Google!](http://lmgtfy.com/?q=R+help) - but seriously this solves 
+ >99% of problems
+4. [StackOverflow](http://stackoverflow.com/questions/tagged/r)
+5. [Jim Leach](mailto:jim@thedatagent.com)
+6. [R mailing list](http://www.r-project.org/mail.html)
+
+## *How* to ask for help
+
+If you really have a problem that you can't solve with Google you may 
+want to post to Stack Overflow, the R mailing list or similar. If you 
+do, remember to:
+
+1. Be explicit - state your problem in detail.
+2. Describe the goal of your analysis - not the programming steps you're taking.
+3. Provide reproducible examples - simulate the data if needs be.
+4. Provide your hardware/software set up.
+
+# Getting Sta-R-ted | Loading data
+
+## Data structures
+
+There are a range of different objects in R that hold some form of data. The most common are:
+
+* Vectors - a sequence of values that have the same data type (e.g. all numbers or all letters). 
+* Lists - similar to vectors but can have different data types (e.g. a mix of numbers of characters).
+
+Think of these two as a bit like a single column in SQL/SAS/Excel.
+
+* Matrices - a table of values where all fields have the same data type.
+* Data frames - a table of values with different data types in each field.
+
+These latter two can be though of as SQL/SAS tables/datasets.
+
+## Quick tip - assignment in R
+
+In R we use the `<-` symbol to assign a value or some data to an R object. We've seen this already:
+
+```{r assingmenteg1, results = 'hide',eval=FALSE}
+a <- 10
+```
+
+We can assign (pretty much) anything to be an R object - including an entire data set.
+
+When we assign data from an engagement to an object in R we're generally going to create a `data.frame`. 
+
+```{r assingmenteg2, results = 'hide',eval=FALSE}
+data  <- SomeDataFromSomewhere
+```
+
+## Reading from .csv
+
+Loading data from CSV is usually the quickest and easiest method to get data in to R. To do it we use the 'read.csv' command. This takes the form `read.csv("path/to/the/data",...)`. 
+
+`...` indicates other options we might want to specify.
+
+Let's look at that now.
+
+```{r readCSV, results='hide'}
+iris <- read.csv("./data/iris.csv", header = T)
+```
+
+Generally, `read.csv` only needs you to specify the file path, the other options (e.g. header row true/false) are taken care of for you.
+
+Try reading the `iris.csv` data file in to R.
+
+
+## Reading from other flat file sources
+
+`read.csv` is a hugely useful function if we have `.csv` files. But what if we've got a tab-delimited file or some other flat file source?
+
+Checking the help file with `?read.csv` shows us how we might solve this problem. The general way to read flat files is with:
+
+```{r readTable, eval=FALSE}
+data <- read.table("path/to/file",...)
+```
+
+There's a lot of options we can set. This means we can flexibly load pretty much any text or flat file source, as long as we know its properties. 
+
+We say that `read.csv` is a _wrapper_ for `read.table` - it sets a lot of these options for us so we don't have to worry. The help file lists a number of other wrappers that set different options. We won't practice it now, but we've also included tab- and pipe ("|") delimited versions of the iris data set for those of you that want to try these out later.
+
+## Reading from Excel
+
+Excel is notorious for making importing data a nightmare. It's no different with R. We advise that you save your Excel file(s) as .csv files before importing in to R. 
+
+However if you *have* to import from Excel, we recommend using the `xlsx` package:
+```{r readExcel}
+library(xlsx, quietly = T)
+iris <- read.xlsx("./data/iris.xlsx", sheetName = "iris", header = T)
+```
+
+When you assign the data from Excel to the `iris` object you'll overwrite the previous object. Don't worry about this for now, but remember to be careful "in the wild".
+
+If we look at the help file with `?read.xlsx` we see that there are lots of options we can set, including reading in a specific named sheet, setting a start and end row and more.
+
+## Reading from SQL - Setting up the connection
+
+Before connecting to a SQL database (for example on the CoLo) you'll need to set up a DSN (essentially a reference for your database). 
+
+This is pretty straightforward and can be done via Start > Control Panel > Administrative Tools > Data Sources (ODBC).
+
+Note that there is difference between a *user* DSN and a *system* DSN. The former is just set up for you, the latter for anyone using that machine.
+
+***
+
+Once we've established our DSN we can set up a connection to the database using:
+
+```{r odbcSetup, eval=FALSE}
+library(RODBC, quietly = T)
+ch <- odbcConnect("the name of the DSN you created", 
+                  uid = "your user name", 
+                  pwd = "your password")
+```
+
+The object `ch` contains the information we need to access the database. We'll use this object later.
+
+N.b. If you're working on the CoLo you probably won't need to specify a user name or password (as the DSN will contain these by default). Also be careful of exposing this information if you end up sharing your code anywhere!
+
+## Reading from SQL - Getting the data in to R
+
+There are a number of functions we can use in the `RODBC` package to interact with our database.
+
+Listing available tables and views (in a particular schema with the schema option):
+```{r sqlTables, eval=FALSE}
+sqlTables(ch, schema = "dbo")
+```
+
+List available columns
+```{r sqlColumns, eval=FALSE}
+sqlColumns(ch, "dbo.table_name")
+```
+
+***
+
+Load data from SQL:
+```{r sqlFetch, eval=FALSE}
+data <- sqlFetch(ch, "dbo.table_name")
+```
+
+Load data in batches:
+```{r sqlFetch2, eval=FALSE}
+data <- sqlFetch(ch, "dbo.table_name", max = some_number)
+data <- sqlFetchMore(ch, "dbo.table_name", max = some_number)
+```
+
+Bespoke SQL query:
+```{r sqlQuery, eval=FALSE}
+data <- sqlQuery(ch, "select * from dbo.table_name where column1 in ('value1')")
+```
+
+## Reading from Stata/SAS
+
+Using the `foreign` package we can read all sorts of data in to R:
+```{r loadForeign, eval=FALSE}
+library(foreign, quietly = T)
+```
+
+Stata data sets:
+```{r readDTA, eval=FALSE}
+data <- read.dta("/path/to/file.dta")
+```
+
+SAS data sets
+```{r readSAS, eval=FALSE}
+data <- read.ssd("libname","data_set_name")
+```
+
+N.B. This requires SAS to be installed! If you don't have SAS installed you'll need a way to convert your SAS data sets to something else that R can read.
+
+## Reading from anywhere
+
+One of the benefits of R is that is can read pretty much any data source you name:
+
+* Web API or raw webpages - XML/json/html
+* HDFS (Hadoop data)
+* pdf and Word documents
+* image files (.jpeg, .png)
+* audio files (.mp3, .flac)
+* binary(!)
+
+If you ever need to read data in one of these formats and you don't know how, the best way to find the answer is to Google:
+
+"R package read [data source here] data"
+
+## Writing data with R
+
+Most of the read functions we've seen already have write equivalents:
+
+### Flat files and csv
+
+```{r writeFlat, eval=FALSE}
+write.table(iris, file = "./outputs/iris.txt", sep = "|", row.names = FALSE)
+write.csv(iris, file = "./outputs/iris.csv", row.name = FALSE)
+```
+
+Try one of these now.
+
+### SQL data
+
+Dropping, creating and updating tables:
+```{r writeSQL, eval=FALSE}
+sqlDrop(ch, "dbo.table_name")
+sqlSave(ch, data.frame, tablename = "dbo.new_table")
+sqlUpdate(ch, data.frame, tablename = "dbo.table_name")
+```
+
+## Writing data with R
+
+### SAS/Stata
+
+Can also be written using the foreign package
+
+```{r writeForeign, eval=FALSE}
+write.foreign(data.frame, 
+              file = "./outputs/filename",
+              codefile = "./outputs/codefile",
+              package = ("SAS"))
+
+write.foreign(data.frame, 
+              file = "./outputs/filename",
+              codefile = "./outputs/codefile",
+              package = ("Stata"))
+```
+
+## Final note - data types in R
+
+R stores data as one of the following types (similar to data types in a SQL database):
+
+* Numeric - numbers with decimal points
+* Integer - whole numbers
+* Logical - boolean True/False
+* Factors - categorical data, with each category stored as a numerical level "under the bonnet". Factors can be ordered ("Ordinal") or un-ordered ("Nominal").
+* Character - srings
+
+Your code will behave differently depending on the data type.
+
+# Moving Fu-R-ther | Checking and exploring data
+
+## Looking at your data
+
+The first thing most of us want to do with our data is to look at it. In R Studio we can accomplish this in a few ways.
+
+1. Click on the data frame in your Environment window - this will open up the data viewer.
+2. Using the `View()` command from the script or the command line - this will also open the viewer
+3. Use the `head()` command - this will print the first few lines of the data to the console.
+
+Try this now.
+
+## Checks and Summaries
+
+There are two incredibly useful commands in R for getting a quick overview of your data.
+
+* `str`: prints an overview of your data, including dimensions and data type (class) of each column.
+```{r str, eval=FALSE}
+str(iris)
+```
+* `summary`: presents a summary of each column, depending on the class of data within it. 
+```{r summary,eval=FALSE}
+summary(iris)
+```
+These are both great ways to spot and then fix things that might slow you down later, such as numeric data being treated as a character, or unexpected extreme values. Try them now.
+
+## Fixing problems - Working with columns
+
+You can access a single column from a dataframe using the `$` operator:
+
+```{r dollar, eval=FALSE}
+iris$Sepal.Length
+```
+
+## Fixing problems - changing data types
+
+If we want to change the data type of a specific field, we can use a variety of `as.[data_type]` functions to *coerce* data to the type we want it. 
+
+This is when we force a field to be a specific data type; similar to using `CAST()` or `CONVERT()`.
+
+We know how to select a single column with `$`, so let's look at how we change the data type:
+```{r as.,eval=FALSE}
+as.character(iris$Sepal.Length) # Forces the values to be characters
+as.numeric(iris$Sepal.Width)    # Forces the values to be numbers
+```
+
+*** 
+
+We can combine selection and coercion with the assignment operator `<-` to "fix" data in our table:
+```{r as.<-,eval=FALSE}
+iris$Sepal.Length <- as.character(iris$Sepal.Length) # Change the length to text
+summary(iris$Sepal.Length)    # Check what we've done
+iris$Sepal.Length <- as.numeric(iris$Sepal.Length) # Change it back
+```
+
+## Other summaries
+
+There are a range of other summaries we can compute on our data. Here are a few examples:
+```{r summaries,eval=FALSE}
+
+min(iris$Sepal.Length)    # Gives the minimum
+mean(iris$Sepal.Length)   # Gives the mean
+max(iris$Sepal.Length)    # Gives the maximum
+
+range(iris$Sepal.Length)  # Gives the min and max
+
+unique(iris$Sepal.Length) # Gives unique values - similar to SQL "DISTINCT"
+
+table(iris$Sepal.Length)  # Gives a frequency table
+```
+
+Most common descriptive statistics have their own similar function(s), it's just a matter of experimenting or Google-ing to find the one you're looking for.
+
+## Final note - missing values
+
+All languages handle missing values differently. In R, missing values are represented as `NA`. 
+
+If we run summaries on data containing `NA` then we get an answer of `NA`, e.g.
+```{r NAeg}
+x <- c(1, 2, 3, 4, 5, NA)
+mean(x)
+```
+
+We can get around this by adding the `na.rm` argument to the function:
+```{r NAeg2}
+mean(x, na.rm = T)
+```
+
+# Digging Deepe-R | Manipulating and aggregating your data
+
+## Pro-tip - piping your operations
+
+Before we get in to the details of data manipulation and aggregation, there's an important point we'd like to make about a fantastic new feature in R: the `%>%` pipe.
+
+Taken from the [magrittr](http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) package and popularised in [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html), you can read the `%>%` pipe as "then". e.g., the code:
+```{r pipe, eval=FALSE}
+library(magrittr)
+some_data %>% some_function
+```
+can be read as "take some_data, __then__ perform some function on it".
+
+To get specific, the left hand side of `%>%` is *piped* into the first argument of the function on the right hand side. There are a few restrictions on exactly what you can *pipe* in to what, but for our purposes this is a good rule of thumb.
+
+## dplyr - Selecting and dropping variables
+
+The [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package contains a number of powerful "verbs" that you can use for data manipulation. The simplest of these is `select`: 
+
+```{r dplyrSelect, eval=FALSE}
+library(dplyr)
+iris %>%
+  select(Sepal.Length, Species)
+```
+
+We can combine also use "negative selection" to drop variables we don't want any more
+```{r dplyrDrop, eval=FALSE}
+iris %>%
+  select(-Sepal.Length, -Species)
+```
+
+## dplyr - Filtering
+
+You can think of `filter` as the `WHERE` clause. 
+```{r dplyrFilter, eval=FALSE}
+iris %>%
+  filter(Species == "setosa") # Text condition
+
+iris %>%
+  filter(Sepal.Length > 5) # Numeric condition
+
+iris %>%
+  filter(Sepal.Length > 5 & Species == "setosa") # Both!
+
+setosa <- iris %>%
+          filter(Species == "setosa") # Filtering with assignment
+```
+
+To combine multiple filters use `&` for `AND` and `|` for `OR`.
+
+## dplyr - Filtering
+
+Pretty much any logical test can be used with `filter`, including:
+
+* `>` greater than
+* `<` less than
+* `==` equal to
+* `>=` greater than or equal to
+* `<=` less than or equal to
+* `%in%` - similar to `IN` in SQL
+* `between`
+
+## dplyr - Adding variables
+
+With dplyr we can add variables to a data set using `mutate`:
+```{r dplyrMutate, eval=FALSE}
+iris %>%
+  mutate(newField = 4) # set up a new field with the value 4 (always)
+```
+
+We can also use simple functions to do calculations:
+```{r dplyrMutateCalc,eval=FALSE}
+iris %>%
+  mutate(totalLength = Sepal.Length + Petal.Length,
+         totalWidth = Sepal.Width + Petal.Width) # Create two variables
+```
+
+Or, use conditions to create variables (similar to a `CASE` statment):
+```{r dplyrManipCase, eval=FALSE}
+iris %>%
+  mutate(totalLength = ifelse(Sepal.Length + Petal.Length > 8, "Long", "Short"))
+```
+
+## dplyr - Simple aggregations
+
+The `summarise` command is a powerful way to compute summaries over the data:
+```{r dplyrSummarise, eval=FALSE}
+iris %>%
+  summarise(meanLength = mean(Sepal.Length + Petal.Length),
+            maxLength = max(Sepal.Length + Petal.Length))
+```
+
+Again, note that we can create multiple summaries using multiple functions within `summarise`.
+
+Most functions can be applied within summarise (including bespoke ones!). However, we're probably more interested in grouping our data first.
+
+## dplyr - Aggregating by groups
+
+Similar to SQL, dplyr has a `group_by` function that we can add to the chain of commands. However, note that the order is different to standard SQL:
+
+1. Select the data;
+2. Group by; then
+3. Summarise.
+
+```{r dplyrGroup, eval=FALSE}
+iris %>%
+  group_by(Species) %>%
+  summarise(meanLength = mean(Sepal.Length))
+```
+
+## dplyr - Putting it all together
+
+We can create a big pipeline that chains all of these commands together to create a brand new data set:
+```{r dplyrChain, eval=FALSE}
+irisSummary <- iris %>%
+                mutate(totalLength = Sepal.Length + Petal.Length,
+                       totalWidth = Sepal.Width + Petal.Width) %>%
+                group_by(Species) %>%
+                summarise(meanLenght = mean(totalLength),
+                          meanWidth = mean(totalWidth))
+
+```
+
+### Test
+
+Try to create a new data set, `irisSummary`. Create this from iris, then group by species then summarise and calculate the mediaum value of Sepal Length for each group.
+
+## dplyr - joins
+
+The latest version of dplyr has also implemented a great set of `join` operations to facilitate even easier data manipulation directly in R:
+
+```{r dplyrJoins, eval=FALSE}
+# Mutating joins - return all relevant rows from both tables
+left_join(data1, data2, by = "variable")
+
+right_join(data1, data2, by = "variable")
+
+inner_join(data1, data2, by = "variable")
+
+outer_join(data1, data2, by = "variable")
+
+# Filtering joins - return all relevant rows from the first table
+semi_join(data1, data2, by = "variable") # All rows in A that have matches in B
+
+anti_join(data1, data2, by = "varibale") # All rows in A that have no matches in B
+```
+
+## dplyr - So many options!
+
+Overall dplyr is a fantastic package that makes data manipulation incredibly easy. We've covered some of the basic functions today. For a complete set, along with examples, be sure to check out the [cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/01/data-wrangling-cheatsheet.pdf) the author has released (we'll share it with you, too).
+
+Some tasters include:
+
+<div class="columns-2">
+   * `distinct`
+   * `rename`
+   * `lead`
+   * `lag`
+   * `dense_rank`
+   * `percent_rank`
+   * `row_number`
+   * `arrange`
+</div>
+
+## tidyr - Reshaping your data
+
+There are several [principles](http://vita.had.co.nz/papers/tidy-data.pdf) of *tidy* data. Generally we want our data in one of two formats: i. wide; or ii. long.
+
+Thankfully, the `tidyr` package makes moving between them easy. (We do need a unique identifier for each observation, though.)
+
+This process is the equivalent of a `PROC TRANSPOSE` in SAS (or horrible self-joins in SQL!).
+
+```{r tidyr, eval=FALSE}
+library(tidyr)
+
+iris$id <- 1:nrow(iris) # Create the unique ID
+
+irisLong <- gather(iris, measurement, value, -c(Species, id)) # Move from wide to long
+
+irisWide <- spread(irisLong, measurement, value) %>% View # Move back to wide from long
+```
+
+# Closing R-marks
+
+## Summary
+
+
+## Getting help - again
+
+As we said at the begining, there are lots of great sources of help for R problems. The top 3 are probably:
+
+1. R help files: `?mean`, `?iris`
+2. R package vignettes - can see those available with `vignette()`
+3. [Google!](http://lmgtfy.com/?q=R+help)
+
+## Asking nicely
+
+If you really have a problem that you can't solve yourself remember to:
+
+1. Be explicit - state your problem in detail.
+2. Describe the goal of your analysis - not the programming steps you're taking.
+3. Provide reproducible examples - simulate the data if needs be.
+4. Provide your hardware/software set up.
+
+## More R-esources
+
+There are loads of great sources of R information out there. Here are just a few:
+
+* [CRAN](http://cran.r-project.org/doc/manuals/R-intro.pdf)
+* [Coursera](https://www.coursera.org/specialization/jhudatascience/1?utm_medium=listingPage)
+* [DataCamp](https://www.datacamp.com/)
+* [Books](http://www.burns-stat.com/documents/tutorials/impatient-r/)
+* [More books](http://www.burns-stat.com/documents/books/the-r-inferno/)
+* [Even more books](http://adv-r.had.co.nz/)
+* [R-Bloggers](http://www.r-bloggers.com/)
+
+
+## Go fo-R it
+
+To close up the session, we want to reiterate how great we think R is. 
+
+* It's flexible, powerful and free.
+* It's the number one tool for data analysis in the world.
+* It's still growing.
+* It translates to "big data".
+
+
+
+
+
+
+
