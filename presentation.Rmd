@@ -13,15 +13,9 @@ widescreen: true
 
 ## Background
 
-Following the success of R the Knowledge Sharing Session last year, 
-we're back with an updated introduction to a number of new R tools and features.
+R is a widely used, open source language. It can be easily incorporated into most data-oriented or analytical projects. It can handle pretty much any sort of analysis, the tough thing is getting your data in to the right shape to do so.
 
-R is a widely used, open source language. It can be easily incorporated into 
-most client engagements. We aim to show you how.
-
-In this session, We'll discuss how you can start doing more of your 
-existing work in R. We'll also cover some of the newer and more exciting 
-features that R offers to help our analytics processes from end-to-end.
+As such, in this session we'll discuss how you can start doing some common data manipulation tasks using R. Whilst this won't make you an R wizard, it should give you some of the basic building blocks for starting to use R more widely.
 
 ## Isn't R just for stats?
 
@@ -30,8 +24,6 @@ Simply put: no.
 Whilst R does have powerful statistical capabilities (in fact, more than other [languages](http://stanfordphd.com/Statistical_Software.html)) it's also [ranked highly](http://www.oreilly.com/data/free/2014-data-science-salary-survey.csp) (behind only SQL and Excel) as a general analytics tool. 
 
 It's also the 6^th^ most popular [programming language](http://blog.revolutionanalytics.com/2014/07/ieee-ranks-r-9-amongst-all-languages.html) in the world. Not bad.
-
-Statistical analysis using R will be discussed in another session. For now we will show you simple ways to start using R and how it can add value to the work we do for clients.
 
 ## Why R?
 
@@ -68,57 +60,34 @@ Statistical analysis using R will be discussed in another session. For now we wi
 
 ## Agenda
 
-Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment. We think it's the best way to use R, so We'll provide a brief overview of it before diving in to:
+Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment. It's the best way to use R, so we'll provide a brief overview of it before diving in to:
 
-* How R stores data;
-* How to read/write data with to R;
-* How to check and explore your data;
-* How to manipulate your data;
-* How to visualise your data; and
-* How to report on your data.
+* Reading data in to R;
+* Quick looks at your data;
+* Simple data manipulations;
+* Data cleaning;
+* Working with strings;
+* Some simple loops; and
+* Joining data together
 
-# R Studio | A whistlestop tour
 
-## Layout
+## R Studio | A whistlestop tour
 <div class="columns-2">
-   ![rstudio](./resources/rstudio.png)
+   <img src="./resources/images/rstudio.png" height="300" width="520">
 
-   * Console (bottom left)
-   * Scripting/Source (top left)
-   * Environment (top right)
-   * Files, plots, help, packages (bottom right)
+   * Console
+   * Scripting/Source
+   * Environment
+   * Files, plots, help, packages
 </div>
-
-
-## Basic useR - typing at the console
-
-The console command line is an easy way to run any R command you can 
-think of. Try:
-
-```
-print("Hello world")
-
-2+2
-
-a <- 10
-a
-a * 3
-
-b <- 1:10
-b
-b + 2
-sum(b)
-```
 
 ## Advanced useR - scripting
 
-The scripting environment in R functions just like a code window in SQL 
-Server Management Studio, a SAS program, or a Stata do-file.
+The scripting environment in R functions just like a code window in any other language.
 
-To create a new script, use Ctrl+Shift+N, click the "new script" icon in 
-the top left corner of R Studio or use File > New File > RScript.
+To create a new script, use Ctrl+Shift+N, click the "new script" icon in the top left corner of R Studio or use File > New File > RScript.
 
-We recommend using scripts as they:
+Scripts are recommended as they:
 
 1. Record your steps clearly; and
 2. Ensure you can replicate and modify your work easily.
@@ -130,19 +99,21 @@ is the equivalent of typing them in to the console.
 
 ## The bits that aren't for typing
 
-* Top right
-     * Environment - shows all objects (i.e. data) currently loaded in 
+* __Environment__ - shows all objects (i.e. data) currently loaded in 
 to R. More on this later.
-     * History - a list of recently executed R commands.
+* __History__ - a list of recently executed R commands.
+* __Files__ - operates as a file browser, helping you navigate around your file system.
+* __Plots__ - displays any plots you've made from an R script or from the console.
+* __Packages__ - lists all the packages you've got installed/loaded. 
+* __Help__ - Displays information on all R functions, the options for each one and examples of their usage.
 
-* Bottom right
-     * Files - operates as a file browser, helping you navigate around 
-your file system.
-     * Plots - displays any plots you've made from an R script or from 
-the console.
-     * Packages - lists all the packages you've got installed/loaded. 
-     * Help - Displays information on all R functions, the options for 
-each one and examples of their usage.
+## Projects
+
+RStudio projects are a great way to organise your work and keep things together. 
+
+They can be created easily by clicking the drop down in the top right of your RStudio window and selecting "New project". You can choose to associate one with an existing folder/directory, or make one somewhere new.
+
+When you shut a project, anything you were working on will get re-opened the next time you shut a project, and your working directory will automatically get set to wherever the project is saved.
 
 ## Packages
 
@@ -153,26 +124,14 @@ Today we'll be discussing and using a number of packages that will help us get s
 ## Packages
 
 * [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) - data manipulation
-* [ggplot2](http://ggplot2.org/) - data visualisation
-* [tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) - data tidying
 * [magrittr](http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) - data pipelines
-* [RODBC](http://www.statmethods.net/input/dbinterface.html) - reading data from ODBC connections
-* [xlsx](http://cran.r-project.org/web/packages/xlsx/xlsx.pdf) - reading data from Excel
-* [foreign](http://cran.r-project.org/web/packages/foreign/foreign.pdf) - reading data from anywhere!
-* [rmarkdown + knitr](http://rmarkdown.rstudio.com/) - reporting from R
+* [readxl](http://blog.rstudio.org/2015/04/15/readxl-0-1-0/) - reading data from Excel
+* [stringr](https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html) - working with strings
+* [lubridate](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/) - working with dates and times
 
-The first 4 of these packages were created by [Hadley Wickham](http://had.co.nz/). His work is so prolific and popular that his approach to data analysis is known as the "hadleyverse" in the R community. He's also writing the most comprehensive [book](http://adv-r.had.co.nz/) on R out there.
+All of these packages were (co)created by [Hadley Wickham](http://had.co.nz/). His work is so prolific and popular that his approach to data analysis is known as the "hadleyverse" in the R community. He's also writing the most comprehensive [book](http://adv-r.had.co.nz/) on R out there.
 
-## Working youR way - how R manages your data
-
-R uses the concept of a working directory, essentially where on your file system your scripts and data are saved. A bit like a `libname` in SAS. To see where you're currently working run `getwd()`
-
-You can change where you're working using `setwd(path/to/project/files)` (note that you should use forward slash in file paths).
-
-R holds everything you're working on in a "workspace". This includes data you've loaded, functions you've written, outputs from statistical models and more. Essentially it's everything you'll ever see in the "Environment" area in the top right.
-
-You can save your environment for later using ```save.image()``` and bring it back with ```load()```. We don't necessarily recommend this, though.
-
+Note that are many alternatives to the "Hadley" way of doing things, but for beginners his methods are often easiest to get to grips with.
 
 # A quick aside | Getting help
 
@@ -209,26 +168,24 @@ There are a range of different objects in R that hold some form of data. The mos
 * Vectors - a sequence of values that have the same data type (e.g. all numbers or all letters). 
 * Lists - similar to vectors but can have different data types (e.g. a mix of numbers of characters).
 
-Think of these two as a bit like a single column in SQL/SAS/Excel.
+Think of these two as a bit like a single column in SQL/Excel.
 
 * Matrices - a table of values where all fields have the same data type.
 * Data frames - a table of values with different data types in each field.
 
-These latter two can be though of as SQL/SAS tables/datasets.
+These latter two can be though of as SQL/Excel tables/datasets.
 
 ## Quick tip - assignment in R
 
 In R we use the `<-` symbol to assign a value or some data to an R object. We've seen this already:
 
-```{r assingmenteg1, results = 'hide',eval=FALSE}
+```{r assingmenteg1, eval=FALSE}
 a <- 10
 ```
 
 We can assign (pretty much) anything to be an R object - including an entire data set.
 
-When we assign data from an engagement to an object in R we're generally going to create a `data.frame`. 
-
-```{r assingmenteg2, results = 'hide',eval=FALSE}
+```{r assingmenteg2, eval=FALSE}
 data  <- SomeDataFromSomewhere
 ```
 
@@ -240,14 +197,13 @@ Loading data from CSV is usually the quickest and easiest method to get data in 
 
 Let's look at that now.
 
-```{r readCSV, results='hide'}
-iris <- read.csv("./data/iris.csv", header = T)
+```{r readCSV, eval=FALSE}
+data <- read.csv("[some data].csv", header = TRUE, stringsAsFactors = FALSE)
 ```
 
 Generally, `read.csv` only needs you to specify the file path, the other options (e.g. header row true/false) are taken care of for you.
 
-Try reading the `iris.csv` data file in to R.
-
+Try reading the `oyster_all_raw_20151113.csv` data file in to R.
 
 ## Reading from other flat file sources
 
@@ -261,106 +217,29 @@ data <- read.table("path/to/file",...)
 
 There's a lot of options we can set. This means we can flexibly load pretty much any text or flat file source, as long as we know its properties. 
 
-We say that `read.csv` is a _wrapper_ for `read.table` - it sets a lot of these options for us so we don't have to worry. The help file lists a number of other wrappers that set different options. We won't practice it now, but we've also included tab- and pipe ("|") delimited versions of the iris data set for those of you that want to try these out later.
+`read.csv` is a _wrapper_ for `read.table` - it sets a lot of these options for us so we don't have to worry. The help file lists a number of other wrappers that set different options. 
 
 ## Reading from Excel
 
 Excel is notorious for making importing data a nightmare. It's no different with R. We advise that you save your Excel file(s) as .csv files before importing in to R. 
 
-However if you *have* to import from Excel, we recommend using the `xlsx` package:
-```{r readExcel}
-library(xlsx, quietly = T)
-iris <- read.xlsx("./data/iris.xlsx", sheetName = "iris", header = T)
+However if you *have* to import from Excel, we recommend using the `readxl` package:
+```{r readExcel, eval=FALSE}
+library(readxl)
+data <- read_excel("path/to/excel/file", sheet = "[the sheet you want]", col_names = T)
 ```
 
-When you assign the data from Excel to the `iris` object you'll overwrite the previous object. Don't worry about this for now, but remember to be careful "in the wild".
-
-If we look at the help file with `?read.xlsx` we see that there are lots of options we can set, including reading in a specific named sheet, setting a start and end row and more.
-
-## Reading from SQL - Setting up the connection
-
-Before connecting to a SQL database (for example on the CoLo) you'll need to set up a DSN (essentially a reference for your database). 
-
-This is pretty straightforward and can be done via Start > Control Panel > Administrative Tools > Data Sources (ODBC).
-
-Note that there is difference between a *user* DSN and a *system* DSN. The former is just set up for you, the latter for anyone using that machine.
-
-***
-
-Once we've established our DSN we can set up a connection to the database using:
-
-```{r odbcSetup, eval=FALSE}
-library(RODBC, quietly = T)
-ch <- odbcConnect("the name of the DSN you created", 
-                  uid = "your user name", 
-                  pwd = "your password")
-```
-
-The object `ch` contains the information we need to access the database. We'll use this object later.
-
-N.b. If you're working on the CoLo you probably won't need to specify a user name or password (as the DSN will contain these by default). Also be careful of exposing this information if you end up sharing your code anywhere!
-
-## Reading from SQL - Getting the data in to R
-
-There are a number of functions we can use in the `RODBC` package to interact with our database.
-
-Listing available tables and views (in a particular schema with the schema option):
-```{r sqlTables, eval=FALSE}
-sqlTables(ch, schema = "dbo")
-```
-
-List available columns
-```{r sqlColumns, eval=FALSE}
-sqlColumns(ch, "dbo.table_name")
-```
-
-***
-
-Load data from SQL:
-```{r sqlFetch, eval=FALSE}
-data <- sqlFetch(ch, "dbo.table_name")
-```
-
-Load data in batches:
-```{r sqlFetch2, eval=FALSE}
-data <- sqlFetch(ch, "dbo.table_name", max = some_number)
-data <- sqlFetchMore(ch, "dbo.table_name", max = some_number)
-```
-
-Bespoke SQL query:
-```{r sqlQuery, eval=FALSE}
-data <- sqlQuery(ch, "select * from dbo.table_name where column1 in ('value1')")
-```
-
-## Reading from Stata/SAS
-
-Using the `foreign` package we can read all sorts of data in to R:
-```{r loadForeign, eval=FALSE}
-library(foreign, quietly = T)
-```
-
-Stata data sets:
-```{r readDTA, eval=FALSE}
-data <- read.dta("/path/to/file.dta")
-```
-
-SAS data sets
-```{r readSAS, eval=FALSE}
-data <- read.ssd("libname","data_set_name")
-```
-
-N.B. This requires SAS to be installed! If you don't have SAS installed you'll need a way to convert your SAS data sets to something else that R can read.
+If we look at the help file with `?read_excel` we see that there are lots of options we can set, including reading in a specific named sheet, setting a start row and specifying the type data in each column.
 
 ## Reading from anywhere
 
-One of the benefits of R is that is can read pretty much any data source you name:
+One of the benefits of R is that is can read pretty much any data source you name using a variety of packages:
 
-* Web API or raw webpages - XML/json/html
-* HDFS (Hadoop data)
-* pdf and Word documents
-* image files (.jpeg, .png)
-* audio files (.mp3, .flac)
-* binary(!)
+* Other software (e.g. Stata/SPSS/SAS) - `foreign`
+* SQL databases - `RPostgreSQL`, `RODBC`, `RMySQL`, `RSQLite`
+* Web API or raw webpages - `xml2`, `rjson`, `jsonlite`, `rvest` 
+* Hadoop ecosystem data - `rmr`, `rhdfs`, `SparkR`
+* pdf and Word documents - `tm`
 
 If you ever need to read data in one of these formats and you don't know how, the best way to find the answer is to Google:
 
@@ -368,43 +247,19 @@ If you ever need to read data in one of these formats and you don't know how, th
 
 ## Writing data with R
 
-Most of the read functions we've seen already have write equivalents:
-
-### Flat files and csv
+It's easy to write out to csv or other flat file sources, too.
 
 ```{r writeFlat, eval=FALSE}
-write.table(iris, file = "./outputs/iris.txt", sep = "|", row.names = FALSE)
-write.csv(iris, file = "./outputs/iris.csv", row.name = FALSE)
+write.table(data, file = "./outputs/iris.txt", sep = "|", row.names = FALSE)
+write.csv(data, file = "./outputs/iris.csv", row.name = FALSE)
 ```
 
-Try one of these now.
-
-### SQL data
-
-Dropping, creating and updating tables:
-```{r writeSQL, eval=FALSE}
-sqlDrop(ch, "dbo.table_name")
-sqlSave(ch, data.frame, tablename = "dbo.new_table")
-sqlUpdate(ch, data.frame, tablename = "dbo.table_name")
+Writing to Excel requires the `xlsx` package:
+```{r write_excl, eval=FALSE}
+library(xlsx)
+write.xlsx(data, file = "/path/to/file.xlsx")
 ```
 
-## Writing data with R
-
-### SAS/Stata
-
-Can also be written using the foreign package
-
-```{r writeForeign, eval=FALSE}
-write.foreign(data.frame, 
-              file = "./outputs/filename",
-              codefile = "./outputs/codefile",
-              package = ("SAS"))
-
-write.foreign(data.frame, 
-              file = "./outputs/filename",
-              codefile = "./outputs/codefile",
-              package = ("Stata"))
-```
 
 ## Final note - data types in R
 
@@ -414,7 +269,7 @@ R stores data as one of the following types (similar to data types in a SQL data
 * Integer - whole numbers
 * Logical - boolean True/False
 * Factors - categorical data, with each category stored as a numerical level "under the bonnet". Factors can be ordered ("Ordinal") or un-ordered ("Nominal").
-* Character - srings
+* Character - strings
 
 Your code will behave differently depending on the data type.
 
