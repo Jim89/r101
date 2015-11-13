@@ -1,0 +1,65 @@
+---
+title: "An Overview of Iris"
+author: '[Your Name]'
+date: "Friday, February 13, 2015"
+output: pdf_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+In short, markdown is a great way of weaving together analysis and reporting. We can do a whole range of things:
+
+# Create titles
+## Subtitles
+### Sub-sub-titles
+
+1. Numbered
+1. Lists
+1. Are
+1. Easy
+
+
+In line equations:
+
+$Sepal.Length = \beta_{0} + \beta_{1}\times$$Sepal.Width + \beta_{2}\times$$Species$ 
+
+Section dividers are simple:
+
+***
+
+* Bullets 
+* Are
+* Easy, too.
+    * Even with indendation!
+
+R code chunks can be incorporated like this:
+
+```{r results='markup', warning=FALSE,message=FALSE}
+library(knitr)
+library(dplyr)
+iris %>%
+  group_by(Species) %>%
+  summarise(meanWidth = mean(Sepal.Width)) %>%
+  kable()
+
+text <- "You can even assign variables and call them out in the text with in-line R code!"
+
+```
+
+You can do anything in a code chunk that you would do in "normal" R. 
+
+`r I(text)`
+
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+library(ggplot2)
+qplot(x = Sepal.Width, data = iris, facets = Species ~ ., fill = Species) + 
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
