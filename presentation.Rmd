@@ -5,7 +5,10 @@ author: ""
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
 hitheme     : tomorrow   # 
-output: ioslides_presentation
+output: 
+    ioslides_presentation:
+        logo: "./resources/images/msc_logo.PNG"
+        css: "./resources/css/styles.css"
 mode: selfcontained
 widescreen: true
 ---
@@ -66,8 +69,8 @@ Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment
 * Quick looks at your data;
 * Simple data manipulations;
 * Data cleaning;
-* Working with strings;
-* Some simple loops; and
+* Working with dates;
+* Working with strings; and
 * Joining data together
 
 
@@ -126,8 +129,16 @@ Today we'll be discussing and using a number of packages that will help us get s
 * [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) - data manipulation
 * [magrittr](http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) - data pipelines
 * [readxl](http://blog.rstudio.org/2015/04/15/readxl-0-1-0/) - reading data from Excel
-* [stringr](https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html) - working with strings
+* [tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) - tidying data
 * [lubridate](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/) - working with dates and times
+
+```{r load_packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(magrittr)
+library(readxl)
+library(stringr)
+library(lubridate)
+```
 
 All of these packages were (co)created by [Hadley Wickham](http://had.co.nz/). His work is so prolific and popular that his approach to data analysis is known as the "hadleyverse" in the R community. He's also writing the most comprehensive [book](http://adv-r.had.co.nz/) on R out there.
 
@@ -165,25 +176,25 @@ do, remember to:
 
 There are a range of different objects in R that hold some form of data. The most common are:
 
-* Vectors - a sequence of values that have the same data type (e.g. all numbers or all letters). 
-* Lists - similar to vectors but can have different data types (e.g. a mix of numbers of characters).
+* __Vectors__ - a sequence of values that have the same data type (e.g. all numbers or all letters). 
+* __Lists__ - similar to vectors but can have different data types (e.g. a mix of numbers of characters).
 
 Think of these two as a bit like a single column in SQL/Excel.
 
-* Matrices - a table of values where all fields have the same data type.
-* Data frames - a table of values with different data types in each field.
+* __Matrices__ - a table of values where all fields have the same data type.
+* __Data frames__ - a table of values with different data types in each field.
 
 These latter two can be though of as SQL/Excel tables/datasets.
 
 ## Quick tip - assignment in R
 
-In R we use the `<-` symbol to assign a value or some data to an R object. We've seen this already:
+In R you should use the `<-` symbol to assign a value or some data to an R object:
 
 ```{r assingmenteg1, eval=FALSE}
 a <- 10
 ```
 
-We can assign (pretty much) anything to be an R object - including an entire data set.
+(Pretty much) anything can be assigned to   an R object - including an entire data set.
 
 ```{r assingmenteg2, eval=FALSE}
 data  <- SomeDataFromSomewhere
@@ -265,11 +276,11 @@ write.xlsx(data, file = "/path/to/file.xlsx")
 
 R stores data as one of the following types (similar to data types in a SQL database):
 
-* Numeric - numbers with decimal points
-* Integer - whole numbers
-* Logical - boolean True/False
-* Factors - categorical data, with each category stored as a numerical level "under the bonnet". Factors can be ordered ("Ordinal") or un-ordered ("Nominal").
-* Character - strings
+* _Numeric_ - numbers with decimal points
+* _Integer_ - whole numbers
+* _Logical_ - boolean True/False
+* _Factors_ - categorical data, with each category stored as a numerical level "under the bonnet". Factors can be ordered ("Ordinal") or un-ordered ("Nominal").
+* _Character_ - strings
 
 Your code will behave differently depending on the data type.
 
@@ -277,13 +288,46 @@ Your code will behave differently depending on the data type.
 
 ## Looking at your data
 
+```{r get_oyster, echo = TRUE}
+oyster <- read.csv("./data/oyster_all_raw_20151113.csv")
+```
+
 The first thing most of us want to do with our data is to look at it. In R Studio we can accomplish this in a few ways.
 
 1. Click on the data frame in your Environment window - this will open up the data viewer.
 2. Using the `View()` command from the script or the command line - this will also open the viewer
-3. Use the `head()` command - this will print the first few lines of the data to the console.
+3. Use the `head([data], [rows])` command - this will print the first few lines of the data to the console.
 
 Try this now.
+
+## A quick look at the data
+
+The Oyster data look something like this:
+
+```{r show_oyster, echo = FALSE}
+library(knitr)
+oyster %>% head(4) %>% kable()
+```
+
+## A quick look at the data (2)
+
+The stations data look like something like this:
+
+```{r show_stations, echo = FALSE}
+library(knitr)
+read.csv("./data/stations.csv") %>% 
+    filter(station %in% c("Richmond", "Canary Wharf", "South Kensington", "Bank",
+                          "Whitechapel", "Algate East")) %>% 
+    head(6) %>% kable()
+```
+
+## Because no one likes typos - make it easier to type
+
+It sounds silly, but capitalisation in column names will slow you down. Luckily, there's an easy way around that - force everything to either upper or lower case. Lower is prefered (as most of `R` is written in lower case) .
+
+```{r makeNamesLower}
+names(oyster) <- tolower(names(oyster))
+```
 
 ## Checks and Summaries
 
@@ -291,21 +335,13 @@ There are two incredibly useful commands in R for getting a quick overview of yo
 
 * `str`: prints an overview of your data, including dimensions and data type (class) of each column.
 ```{r str, eval=FALSE}
-str(iris)
+str(oyster)
 ```
 * `summary`: presents a summary of each column, depending on the class of data within it. 
 ```{r summary,eval=FALSE}
-summary(iris)
+summary(oyster)
 ```
 These are both great ways to spot and then fix things that might slow you down later, such as numeric data being treated as a character, or unexpected extreme values. Try them now.
-
-## Fixing problems - Working with columns
-
-You can access a single column from a dataframe using the `$` operator:
-
-```{r dollar, eval=FALSE}
-iris$Sepal.Length
-```
 
 ## Fixing problems - changing data types
 
@@ -315,40 +351,38 @@ This is when we force a field to be a specific data type; similar to using `CAST
 
 We know how to select a single column with `$`, so let's look at how we change the data type:
 ```{r as.,eval=FALSE}
-as.character(iris$Sepal.Length) # Forces the values to be characters
-as.numeric(iris$Sepal.Width)    # Forces the values to be numbers
+as.character(oyster$credit) # Forces the values to be characters
+as.numeric(oyster$credit)    # Forces the values to be numbers
 ```
 
 *** 
 
 We can combine selection and coercion with the assignment operator `<-` to "fix" data in our table:
 ```{r as.<-,eval=FALSE}
-iris$Sepal.Length <- as.character(iris$Sepal.Length) # Change the length to text
-summary(iris$Sepal.Length)    # Check what we've done
-iris$Sepal.Length <- as.numeric(iris$Sepal.Length) # Change it back
+oyster$credit <- as.character(oyster$credit) # Change the length to text
+str(oyster)    # Check what we've done
+oyster$credit <- as.numeric(oyster$credit) # Change it back
 ```
 
 ## Other summaries
 
 There are a range of other summaries we can compute on our data. Here are a few examples:
+
 ```{r summaries,eval=FALSE}
 
-min(iris$Sepal.Length)    # Gives the minimum
-mean(iris$Sepal.Length)   # Gives the mean
-max(iris$Sepal.Length)    # Gives the maximum
-
-range(iris$Sepal.Length)  # Gives the min and max
-
-unique(iris$Sepal.Length) # Gives unique values - similar to SQL "DISTINCT"
-
-table(iris$Sepal.Length)  # Gives a frequency table
+min(data$field)    # Gives the minimum
+mean(data$field)   # Gives the mean
+max(data$field)    # Gives the maximum
+range(data$field)  # Gives the min and max
+unique(data$field) # Gives unique values - similar to SQL "DISTINCT"
+table(data$field)  # Gives a frequency table
 ```
 
 Most common descriptive statistics have their own similar function(s), it's just a matter of experimenting or Google-ing to find the one you're looking for.
 
 ## Final note - missing values
 
-All languages handle missing values differently. In R, missing values are represented as `NA`. 
+All languages handle missing values differently. In R, missing values are generally represented as `NA`. 
 
 If we run summaries on data containing `NA` then we get an answer of `NA`, e.g.
 ```{r NAeg}
@@ -361,7 +395,36 @@ We can get around this by adding the `na.rm` argument to the function:
 mean(x, na.rm = T)
 ```
 
-# Digging Deepe-R | Manipulating and aggregating your data
+## A quick look at the data - again
+
+```{r show_oyster2, echo = FALSE}
+library(knitr)
+oyster %>% tail(5, addrownums = FALSE) %>% kable()
+```
+
+## A quick look at the data (2) - again
+
+```{r show_stations2, echo = FALSE}
+library(knitr)
+read.csv("./data/stations.csv") %>% 
+    filter(station %in% c("Richmond", "Canary Wharf", "South Kensington", "Bank",
+                          "Whitechapel", "Algate East")) %>% 
+    head(6) %>% kable()
+```
+
+## Some questions to ask of the data
+
+Now we've seen the data, we can start to come up with some exploratory questions we might ask:
+
+* What are the top 5 journeys?
+* What is the average number of journeys per day of the week?
+* What is the average journey time for each day of the week?
+* What was the longest journey, how long was it, and when was it?
+* Where does Jim live, and what are the coordinates of the station?
+
+Given what we have seen in the data, and what we know about how it is stored and structured, what might we need to do to address these questions?
+
+# Digging Deepe-R | Manipulating and aggregating data
 
 ## Pro-tip - piping your operations
 
@@ -376,40 +439,52 @@ can be read as "take some_data, __then__ perform some function on it".
 
 To get specific, the left hand side of `%>%` is *piped* into the first argument of the function on the right hand side. There are a few restrictions on exactly what you can *pipe* in to what, but for our purposes this is a good rule of thumb.
 
+## dplyr - A very brief introduction
+
+The `dplyr` package is a new(ish) package that aims to make data manipulation easier, more consistent and faster.
+
+It is focussed exclusively on data frames and works very well with the pipe paradigm.
+
+It uses a small number of easy to learn functions ("verbs") for the vast majority of operations.
+
+Generally each function takes a data frame as its first argument, and returns a data frame back to you.
+
 ## dplyr - Selecting and dropping variables
 
-The [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package contains a number of powerful "verbs" that you can use for data manipulation. The simplest of these is `select`: 
+The simplest dplyr "verb" is `select`, used to select columns in a data frame.
 
 ```{r dplyrSelect, eval=FALSE}
-library(dplyr)
-iris %>%
-  select(Sepal.Length, Species)
+select([data], [fields to select]) # The general form of the function
+oyster %>% select(Date, journey.action, charge) # Select just date, journey and charge
+oyster %>% select(1, 2, 3) # We can also use column positions to select
+oyster %>% select(1:3, 5, 7)
 ```
 
 We can combine also use "negative selection" to drop variables we don't want any more
 ```{r dplyrDrop, eval=FALSE}
-iris %>%
-  select(-Sepal.Length, -Species)
+oyster %>% select(-journey.action, -charge)
+oyster %>% select(-c(4, 6, 7))
 ```
+
+This can be used to just grab what is needed, or to reorder columns in the data.
 
 ## dplyr - Filtering
 
-You can think of `filter` as the `WHERE` clause. 
+The second verb is `filter`. You can think of `filter` as a `WHERE` clause - it subsets by rows (whereas `select` subsets by columns):
 ```{r dplyrFilter, eval=FALSE}
-iris %>%
-  filter(Species == "setosa") # Text condition
+filter([data], [filter conditions]) # the general form of the function
 
-iris %>%
-  filter(Sepal.Length > 5) # Numeric condition
+oyster %>% filter(charge != 0) # Numeric condition
 
-iris %>%
-  filter(Sepal.Length > 5 & Species == "setosa") # Both!
-
-setosa <- iris %>%
-          filter(Species == "setosa") # Filtering with assignment
+oyster %>% filter(note != "") # Text condition
 ```
 
 To combine multiple filters use `&` for `AND` and `|` for `OR`.
+
+```{r dplyrFilterAssign, eval = FALSE}
+whoops <- oyster %>% filter(balance < 0) # filtering with assignment
+noteworthy <- oyster %>% filter(note != "" & charge >= 2) # multiple conditions
+```
 
 ## dplyr - Filtering
 
@@ -423,70 +498,161 @@ Pretty much any logical test can be used with `filter`, including:
 * `%in%` - similar to `IN` in SQL
 * `between`
 
-## dplyr - Adding variables
-
-With dplyr we can add variables to a data set using `mutate`:
-```{r dplyrMutate, eval=FALSE}
-iris %>%
-  mutate(newField = 4) # set up a new field with the value 4 (always)
-```
-
-We can also use simple functions to do calculations:
-```{r dplyrMutateCalc,eval=FALSE}
-iris %>%
-  mutate(totalLength = Sepal.Length + Petal.Length,
-         totalWidth = Sepal.Width + Petal.Width) # Create two variables
-```
-
-Or, use conditions to create variables (similar to a `CASE` statment):
-```{r dplyrManipCase, eval=FALSE}
-iris %>%
-  mutate(totalLength = ifelse(Sepal.Length + Petal.Length > 8, "Long", "Short"))
-```
-
 ## dplyr - Simple aggregations
 
-The `summarise` command is a powerful way to compute summaries over the data:
+The `summarise` verb is a powerful way to compute summaries over the data:
 ```{r dplyrSummarise, eval=FALSE}
-iris %>%
-  summarise(meanLength = mean(Sepal.Length + Petal.Length),
-            maxLength = max(Sepal.Length + Petal.Length))
+summarise([data], [new_field] = some_function([existing_field])) # the general function
+
+oyster %>% summarise(avg_charge = mean(charge, na.rm = TRUE)) # average charge
 ```
 
-Again, note that we can create multiple summaries using multiple functions within `summarise`.
+Note that multiple summaries using multiple functions within `summarise`, they just need to be separated by a comma:
+
+```{r dplyrSummarise2, eval = FALSE}
+oyster %>% summarise(avg_charge = mean(charge, na.rm = TRUE), # average charge
+                     sd_charge = sd(charge, na.rm = TRUE)) # charge std. deviation
+```
 
 Most functions can be applied within summarise (including bespoke ones!). However, we're probably more interested in grouping our data first.
 
 ## dplyr - Aggregating by groups
 
-Similar to SQL, dplyr has a `group_by` function that we can add to the chain of commands. However, note that the order is different to standard SQL:
+Similar to SQL, dplyr has a `group_by` verb that we can add to the chain of commands. However, note that the order is different to standard SQL: we need to group before we summarise.
 
-1. Select the data;
-2. Group by; then
-3. Summarise.
+(Note that `%>%` pipes flow over multiple lines.)
 
 ```{r dplyrGroup, eval=FALSE}
-iris %>%
-  group_by(Species) %>%
-  summarise(meanLength = mean(Sepal.Length))
+group_by([data], [field_to_group_by_1], [field_to_group_by_2]) # general form
+
+oyster %>% group_by(journey.action) # this doesn't tell us much - add a summary!
+
+oyster %>% 
+    group_by(journey.action) %>% 
+    summarise(avg_cost = mean(charge, na.rm = TRUE)) # more interesting
+```
+
+## dplyr - Arranging data
+
+Finally, something that is often useful is the `arragne` verb, which acts as the `ORDER BY`.
+
+```{r dplyrArrange, eval = FALSE}
+arrange([data], [fields_to_order_by]) # general form
+oyster %>% arrange(date)
+```
+
+Similar to `select` it is possible to use a `-` to do reverse ordering:
+
+```{r dplyrArrangeRev, eval = FALSE}
+oyster %>% arrange(-charge)
+```
+
+And specifiy multiple ordering fields:
+
+```{r dplyrArrangeMult, eval = FALSE}
+oyster %>% arrange(journey.action, -charge)
 ```
 
 ## dplyr - Putting it all together
 
-We can create a big pipeline that chains all of these commands together to create a brand new data set:
-```{r dplyrChain, eval=FALSE}
-irisSummary <- iris %>%
-                mutate(totalLength = Sepal.Length + Petal.Length,
-                       totalWidth = Sepal.Width + Petal.Width) %>%
-                group_by(Species) %>%
-                summarise(meanLenght = mean(totalLength),
-                          meanWidth = mean(totalWidth))
+Now we've seen the individual functions, we can use the `%>%` operator to create a whole set of instructions to answer our questions, e.g.
+
+> What are the top 5 journeys?
+
+
+```{r dplyrChain, eval=TRUE}
+oyster_summary <- oyster %>% 
+                    group_by(journey.action) %>% 
+                    summarise(journeys = n()) %>% 
+                    arrange(-journeys) %>% 
+                    head(5)
+```
+
+## The output
+
+```{r kablechain, echo=FALSE}
+oyster_summary %>% kable()
 
 ```
 
-### Test
 
-Try to create a new data set, `irisSummary`. Create this from iris, then group by species then summarise and calculate the mediaum value of Sepal Length for each group.
+## dplyr - So many options!
+
+`dplyr` is a fantastic package that makes data manipulation incredibly easy. We've so far covered some of the most basic but most used functions. For a complete set, along with examples, be sure to check out the [cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/01/data-wrangling-cheatsheet.pdf) the author has released.
+
+Some tasters include:
+
+<div class="columns-2">
+   * `distinct`
+   * `rename`
+   * `lead`
+   * `lag`
+   * `dense_rank`
+   * `row_number`
+</div>
+
+# Doing Mo-R-e | Removing mess, adding variables, and further cleaning
+
+## Working with mess
+
+A closer inspection of the data will reveal the presence of fake "journeys" as well as journeys that will not be informative. Some examples include:
+
+* "Topped-up"
+* "Season ticket bought"
+* "Unspecified location"
+
+This sort of thing is no good, so we'll remove it. 
+
+(Note there are other "bad records" in the data, see if you can find them.)
+
+## Slicing and dicing
+
+`dplyr` also provides a handy verb, `slice` that allows rows to be filtered by index, a bit like using the `data[row, column]` syntax but more useful in pipelines. 
+
+To start with, though, we need the rows that contain the messy data:
+```{r getMess, eval = TRUE}
+badRecords <- "Topped-up|Season ticket|Unspecified location"
+
+# grep([what to search], [where to search for it])
+records <- grep(badRecords, oyster$journey.action) 
+```
+
+`grep` is an R function that mimics functionality from the Unix command line, it searches for patterns called __regular expressions__. Don't worry too much about regular expressions for now, they're just a compact way of specifying patterns to search for. We'll see some other examples later.
+
+***
+
+Now that we have our index of bad records, we can use `slice` and `"-"` to get rid of the mess:
+
+```{r dplyrSlice}
+# slice([data], [rows to keep or exclude]) the general form
+oyster <- oyster %>% slice(-records)
+```
+
+Note the use of `-` to do "negative selection" to omit records from the data. This is simlar to using `oyster[, -records]` but fits in to a `dplyr` pipeline.
+
+However, there's still a lot of mess - poorly formatted dates and useless journey strings.
+
+## dplyr - Adding variables
+
+With dplyr we can add variables to a data set using the `mutate` verb.
+```{r dplyrMutate, eval=FALSE}
+mutate([data], [some_new_field]) # general form
+oyster %>%  mutate(newField = 4) # set up a new field with the value 4 (always) - useless
+```
+
+We can also use simple functions to do calculations, and specify multiple new fields by separating them with commas.
+```{r dplyrMutateCalc,eval=FALSE}
+oyster %>% mutate(cost_plus_bal = charge + balance, # add charge to balance
+                  cost_plus_bal_clean = sum(charge, balance, na.rm = TRUE)) # clean up
+```
+
+Or, use conditions to create variables (similar to a `CASE` statment):
+```{r dplyrManipCase, eval=FALSE}
+oyster %>% mutate(no_cost = ifelse(charge == 0 | is.na(charge), 1, 0))
+```
+
+## Working with dates and times
+
 
 ## dplyr - joins
 
@@ -506,41 +672,6 @@ outer_join(data1, data2, by = "variable")
 semi_join(data1, data2, by = "variable") # All rows in A that have matches in B
 
 anti_join(data1, data2, by = "varibale") # All rows in A that have no matches in B
-```
-
-## dplyr - So many options!
-
-Overall dplyr is a fantastic package that makes data manipulation incredibly easy. We've covered some of the basic functions today. For a complete set, along with examples, be sure to check out the [cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/01/data-wrangling-cheatsheet.pdf) the author has released (we'll share it with you, too).
-
-Some tasters include:
-
-<div class="columns-2">
-   * `distinct`
-   * `rename`
-   * `lead`
-   * `lag`
-   * `dense_rank`
-   * `percent_rank`
-   * `row_number`
-   * `arrange`
-</div>
-
-## tidyr - Reshaping your data
-
-There are several [principles](http://vita.had.co.nz/papers/tidy-data.pdf) of *tidy* data. Generally we want our data in one of two formats: i. wide; or ii. long.
-
-Thankfully, the `tidyr` package makes moving between them easy. (We do need a unique identifier for each observation, though.)
-
-This process is the equivalent of a `PROC TRANSPOSE` in SAS (or horrible self-joins in SQL!).
-
-```{r tidyr, eval=FALSE}
-library(tidyr)
-
-iris$id <- 1:nrow(iris) # Create the unique ID
-
-irisLong <- gather(iris, measurement, value, -c(Species, id)) # Move from wide to long
-
-irisWide <- spread(irisLong, measurement, value) %>% View # Move back to wide from long
 ```
 
 # Closing R-marks
