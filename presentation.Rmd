@@ -136,7 +136,7 @@ Today we'll be discussing and using a number of packages that will help us get s
 library(dplyr)
 library(magrittr)
 library(readxl)
-library(stringr)
+library(tidyr)
 library(lubridate)
 ```
 
@@ -261,8 +261,8 @@ If you ever need to read data in one of these formats and you don't know how, th
 It's easy to write out to csv or other flat file sources, too.
 
 ```{r writeFlat, eval=FALSE}
-write.table(data, file = "./outputs/iris.txt", sep = "|", row.names = FALSE)
-write.csv(data, file = "./outputs/iris.csv", row.name = FALSE)
+write.table(data, file = "./outputs/file.txt", sep = "|", row.names = FALSE)
+write.csv(data, file = "./outputs/file.csv", row.name = FALSE)
 ```
 
 Writing to Excel requires the `xlsx` package:
@@ -651,8 +651,111 @@ Or, use conditions to create variables (similar to a `CASE` statment):
 oyster %>% mutate(no_cost = ifelse(charge == 0 | is.na(charge), 1, 0))
 ```
 
-## Working with dates and times
+## dplyr - Adding variables
 
+Now we've seen how 'mutate' works, we can use it to clean up our data a bit. Let's start with the poorly formatted times that we've been provided with.
+
+```{r show_times, echo = FALSE}
+oyster %>% select(start.time, end.time) %>% head(3) %>% kable()
+```
+
+
+Looks ok, but not quite what we want. Ideally we'd like `HH:MM:SS` formats.
+
+## dplyr - Adding variables
+
+We can use the 'paste' command to get what we need.
+
+```{r paste_eg, eval = FALSE}
+paste(string1, string2, string3, ..., sep = " ") # paste strings together with a space
+paste0(string1, string2, string3, ...) # paste things together with no space
+```
+
+Combining this with `mutate` it's easy to add cleaned up fields:
+```{r oyster_add_clean_times, eval = TRUE}
+oyster <- oyster %>% 
+            mutate(start.time.clean = start.time %>% paste0(":00"),
+                    end.time.clean = end.time %>% paste0(":00"))
+```
+
+## tidyr - Splitting fields
+
+We're getting closer to something that's useful, but we still could do with splitting _journey_ into separate "from" and "to" fields. Handily, we can use the `tidyr` package to do this, specifically, the `separate` function:
+
+```{r separate_eg, eval = FALSE}
+install.packages("tidyr")
+library(tidyr)
+separate([data], [column to separate], [new columns], sep = [separator], remove = FALSE)
+```
+
+```{r separate_to_from, warning = FALSE, message = FALSE}
+oyster <- oyster %>% 
+          separate(col = journey.action, 
+                   into = c("from", "to"), 
+                   sep = " to ", 
+                   remove = FALSE)
+```
+
+We will need to do some more cleaning to these fields, but for now they suffice.
+
+## lubridate -  Working with dates and times
+
+```{r load_lubridate, eval = FALSE}
+install.packages("lubridate")
+library(lubridate)
+```
+
+Another thing we might want to do is to take what are currently character/string representations of dates and times and turn them in to actual dates and times. 
+
+This can be a bit finnicky in R, so we'll turn to another package, `lubridate` to make things a little easier.
+
+`lubridate` has a whole host of handy functions for operating on dates. We'll see just a few here so be sure to check out a fuller [overview](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/) if you need it.
+
+## lubridate - working with dates
+
+The first thing we might want to do is to change the date to an actual date. `lubridate` provides an easy to remember syntax for this of the form `ymd()` (i.e. _year, month, day_). Changing the order of the `ymd` part will tell `lubridate` that our data is in a different format.
+
+Looking at how we have received the data, it looks like we have a format similar to _day - month - year_. Combinding this with some `dplyr` that we already know we can add a clean date field:
+
+```{r dmy}
+oyster <- oyster %>% mutate(date.clean = dmy(date))
+```
+
+## An aside - the correct way to write a date {.flexbox .vcenter}
+
+<img src="./resources/images/xkcd_date.png" height="450" width="350">
+
+It's simple: __YYYY-MM-DD__
+
+## dplyr - adding date _times_
+
+Dates and times are all well and good, but a _datetime_ variable might be more useful.
+
+Before we do that, we'll need to combine our dates and times together. Again, a bit of `dplyr` and some `paste` will come in handy:
+
+```{r add_date_times_text}
+oyster <- oyster %>% 
+            mutate(start.datetime = paste(date, start.time.clean, sep = " "),
+                    end.datetime = paste(date, end.time.clean, sep = " "))
+```
+
+We'll need to turn these in to _datetime_ variables using `lubridate`
+
+## dplyr & lubridate - modifying fields
+
+We've seen `dplyr` mutate being used to _add_ fields to our data, but it can also _modify_ them in place.
+
+Let's combine a `mutate` with some `lubridate` functions to modify our textual datetimes in to actual datetimes:
+
+```{r add_date_times, warning = FALSE}
+oyster <- oyster %>% mutate(start.datetime = dmy_hms(start.datetime),
+                            end.datetime = dmy_hms(end.datetime))
+```
+
+
+So far so good, there's just one problem. What about dates where we touched in before midnight, but touched out afterwards?
+
+## lubridate - date manipulation
 
 ## dplyr - joins
 
