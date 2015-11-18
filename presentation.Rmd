@@ -1032,9 +1032,10 @@ There are loads of great sources of R information out there. Here are just a few
 
 To close up the session, here are a few things you might like to do figure out how to do with the data:
 
-* Peform all the cleaning we've discussed today in one, clean and tidy code file;
-* Create some exploratory plots using `ggplot2` - histograms of journey times, journeys over time, journey time vs. touch-in time; or
-* Plot station visits on a map;
+* Peform all the cleaning we've discussed today in one (or at most two) pipes, in a clean, tidy and commented code file;
+* Create some exploratory plots using `ggplot2` - histograms of journey times, journeys over time, journey time vs. touch-in time; 
+* Plot station visits on a map;or
+* Treat "from" and "to" as an adjacency list, make an adjacency matrix, plot the (directed) network.
 
 
 
