@@ -88,7 +88,7 @@ Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment
 
 The scripting environment in R functions just like a code window in any other language.
 
-To create a new script, use Ctrl+Shift+N, click the "new script" icon in the top left corner of R Studio or use File > New File > RScript.
+To create a new script, use Ctrl+Shift+N, click the "new script" icon in the top left corner of R Studio or use File > New File > R Script.
 
 Scripts are recommended as they:
 
@@ -144,7 +144,7 @@ library(lubridate)
 
 All of these packages were (co)created by [Hadley Wickham](http://had.co.nz/). His work is so prolific and popular that his approach to data analysis is known as the "hadleyverse" in the R community. He's also writing the most comprehensive [book](http://adv-r.had.co.nz/) on R out there.
 
-Note that are many alternatives to the "Hadley" way of doing things, but for beginners his methods are often easiest to get to grips with.
+Note there are many alternatives to the "Hadley" way of doing things, but for beginners his methods are often easiest to get to grips with.
 
 # A quick aside | Getting help
 
@@ -204,39 +204,38 @@ data  <- SomeDataFromSomewhere
 
 ## Reading from .csv
 
-Loading data from CSV is usually the quickest and easiest method to get data in to R. To do it we use the 'read.csv' command. This takes the form `read.csv("path/to/the/data",...)`. 
-
-`...` indicates other options we might want to specify.
+Loading data from CSV is usually the quickest and easiest method to get data in to R. In base R we can use the 'read.csv' command. However, Hadley has a better way which is the `read_csv` function from the `readr` package.
 
 Let's look at that now.
 
 ```{r readCSV, eval=FALSE}
-data <- read.csv("[some data].csv", header = TRUE, stringsAsFactors = FALSE)
+data <- read_csv("[some data].csv", col_names = TRUE, skip = 0, col_types = NULL)
 ```
 
-Generally, `read.csv` only needs you to specify the file path, the other options (e.g. header row true/false) are taken care of for you.
+Generally, `read_csv` only needs you to specify the file path, the other options (e.g. header row true/false) are taken care of for you.
 
 Try reading the `oyster_all_raw_20151113.csv` data file in to R.
 
 ## Reading from other flat file sources
 
-`read.csv` is a hugely useful function if we have `.csv` files. But what if we've got a tab-delimited file or some other flat file source?
+`read_csv` is a hugely useful function if we have `.csv` files. But what if we've got a tab-delimited file or some other flat file source?
 
-Checking the help file with `?read.csv` shows us how we might solve this problem. The general way to read flat files is with:
+Checking the help file with `?read_csv` shows us how we might solve this problem. The general way to read flat files is with:
 
 ```{r readTable, eval=FALSE}
-data <- read.table("path/to/file",...)
+data <- read_delim("path/to/file",...)
 ```
 
 There's a lot of options we can set. This means we can flexibly load pretty much any text or flat file source, as long as we know its properties. 
 
-`read.csv` is a _wrapper_ for `read.table` - it sets a lot of these options for us so we don't have to worry. The help file lists a number of other wrappers that set different options. 
+`read_csv` is a _wrapper_ for `read_delim` - it sets a lot of these options for us so we don't have to worry. The help file lists a number of other wrappers that set different options. 
 
 ## Reading from Excel
 
-Excel is notorious for making importing data a nightmare. It's no different with R. We advise that you save your Excel file(s) as .csv files before importing in to R. 
+Excel is notorious for making importing data a nightmare. It's no different with R. Ideally you should save your Excel file(s) as .csv files before importing in to R. 
 
-However if you *have* to import from Excel, we recommend using the `readxl` package:
+However if you *have* to import from Excel, then using the `readxl` package is recommended:
+
 ```{r readExcel, eval=FALSE}
 library(readxl)
 data <- read_excel("path/to/excel/file", sheet = "[the sheet you want]", col_names = T)
@@ -260,12 +259,14 @@ If you ever need to read data in one of these formats and you don't know how, th
 
 ## Writing data with R
 
-It's easy to write out to csv or other flat file sources, too.
+It's easy to write out to csv or other flat file sources with `readr`, too.
 
 ```{r writeFlat, eval=FALSE}
-write.table(data, file = "./outputs/file.txt", sep = "|", row.names = FALSE)
-write.csv(data, file = "./outputs/file.csv", row.name = FALSE)
+write_delim(data, file = "./outputs/file.txt", delim = "|")
+write_csv(data, file = "./outputs/file.csv")
 ```
+
+The base R alternatives (`write.table` and `write.csv`) are much slower
 
 Writing to Excel requires the `xlsx` package:
 ```{r write_excl, eval=FALSE}
@@ -280,7 +281,7 @@ R stores data as one of the following types (similar to data types in a SQL data
 
 * _Numeric_ - numbers with decimal points
 * _Integer_ - whole numbers
-* _Logical_ - boolean True/False
+* _Logical_ - Boolean True/False
 * _Factors_ - categorical data, with each category stored as a numerical level "under the bonnet". Factors can be ordered ("Ordinal") or un-ordered ("Nominal").
 * _Character_ - strings
 
@@ -325,7 +326,7 @@ read.csv("./data/stations.csv") %>%
 
 ## Because no one likes typos - make it easier to type
 
-It sounds silly, but capitalisation in column names will slow you down. Luckily, there's an easy way around that - force everything to either upper or lower case. Lower is prefered (as most of `R` is written in lower case) .
+It sounds silly, but capitalisation in column names will slow you down. Luckily, there's an easy way around that - force everything to either upper or lower case. Lower is preferred (as most of `R` is written in lower case) .
 
 ```{r makeNamesLower}
 names(oyster) <- tolower(names(oyster))
@@ -445,7 +446,7 @@ To get specific, the left hand side of `%>%` is *piped* into the first argument 
 
 The `dplyr` package is a new(ish) package that aims to make data manipulation easier, more consistent and faster.
 
-It is focussed exclusively on data frames and works very well with the pipe paradigm.
+It is focused exclusively on data frames and works very well with the pipe paradigm.
 
 It uses a small number of easy to learn functions ("verbs") for the vast majority of operations.
 
@@ -549,7 +550,7 @@ Similar to `select` it is possible to use a `-` to do reverse ordering:
 oyster %>% arrange(-charge)
 ```
 
-And specifiy multiple ordering fields:
+And specify multiple ordering fields:
 
 ```{r dplyrArrangeMult, eval = FALSE}
 oyster %>% arrange(journey.action, -charge)
@@ -630,7 +631,7 @@ Now that we have our index of bad records, we can use `slice` and `"-"` to get r
 oyster <- oyster %>% slice(-records)
 ```
 
-Note the use of `-` to do "negative selection" to omit records from the data. This is simlar to using `oyster[, -records]` but fits in to a `dplyr` pipeline.
+Note the use of `-` to do "negative selection" to omit records from the data. This is similar to using `oyster[, -records]` but fits in to a `dplyr` pipeline.
 
 However, there's still a lot of mess - poorly formatted dates and useless journey strings.
 
@@ -648,7 +649,7 @@ oyster %>% mutate(cost_plus_bal = charge + balance, # add charge to balance
                   cost_plus_bal_clean = sum(charge, balance, na.rm = TRUE)) # clean up
 ```
 
-Or, use conditions to create variables (similar to a `CASE` statment):
+Or, use conditions to create variables (similar to a `CASE` statement):
 ```{r dplyrManipCase, eval=FALSE}
 oyster %>% mutate(no_cost = ifelse(charge == 0 | is.na(charge), 1, 0))
 ```
@@ -662,7 +663,7 @@ oyster %>% select(start.time, end.time) %>% head(3) %>% kable()
 ```
 
 
-Looks ok, but not quite what we want. Ideally we'd like `HH:MM:SS` formats.
+Looks OK, but not quite what we want. Ideally we'd like `HH:MM:SS` formats.
 
 ## dplyr - Adding variables
 
@@ -709,7 +710,7 @@ library(lubridate)
 
 Another thing we might want to do is to take what are currently character/string representations of dates and times and turn them in to actual dates and times. 
 
-This can be a bit finnicky in R, so we'll turn to another package, `lubridate` to make things a little easier.
+This can be a bit finicky in R, so we'll turn to another package, `lubridate` to make things a little easier.
 
 `lubridate` has a whole host of handy functions for operating on dates. We'll see just a few here so be sure to check out a fuller [overview](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/) if you need it.
 
@@ -717,7 +718,7 @@ This can be a bit finnicky in R, so we'll turn to another package, `lubridate` t
 
 The first thing we might want to do is to change the date to an actual date. `lubridate` provides an easy to remember syntax for this of the form `ymd()` (i.e. _year, month, day_). Changing the order of the `ymd` part will tell `lubridate` that our data is in a different format.
 
-Looking at how we have received the data, it looks like we have a format similar to _day - month - year_. Combinding this with some `dplyr` that we already know we can add a clean date field:
+Looking at how we have received the data, it looks like we have a format similar to _day - month - year_. Combining this with some `dplyr` that we already know we can add a clean date field:
 
 ```{r dmy}
 oyster <- oyster %>% mutate(date.clean = dmy(date))
@@ -1001,7 +1002,7 @@ We've also covered the `%>%` piping paradigm which can help to create code that 
 
 ## Getting help - again
 
-As we said at the begining, there are lots of great sources of help for R problems. The top 3 are probably:
+As we said at the beginning, there are lots of great sources of help for R problems. The top 3 are probably:
 
 1. R help files: `?mean`, `?iris`
 2. R package vignettes - can see those available with `vignette()`
@@ -1033,10 +1034,10 @@ There are loads of great sources of R information out there. Here are just a few
 
 To close up the session, here are a few things you might like to do figure out how to do with the data:
 
-* Peform all the cleaning we've discussed today in one (or at most two) pipes, in a clean, tidy and commented code file;
+* Perform all the cleaning we've discussed today in one (or at most two) pipes, in a clean, tidy and commented code file;
 * Create some exploratory plots using `ggplot2` - histograms of journey times, journeys over time, journey time vs. touch-in time; 
 * Plot station visits on a map;or
-* Treat "from" and "to" as an adjacency list, make an adjacency matrix, plot the (directed) network.
+* Treat "from" and "to" as an adjacency list, make an adjacency matrix, plot and analyse the (directed) network.
 
 
 
