@@ -134,6 +134,7 @@ Today we'll be discussing and using a number of packages that will help us get s
 * [lubridate](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/) - working with dates and times
 
 ```{r load_packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
 library(dplyr)
 library(magrittr)
 library(readxl)
