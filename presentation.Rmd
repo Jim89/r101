@@ -126,6 +126,7 @@ Today we'll be discussing and using a number of packages that will help us get s
 
 ## Packages
 
+* [readr](https://github.com/hadley/readr) - reading and writing data
 * [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) - data manipulation
 * [magrittr](http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) - data pipelines
 * [readxl](http://blog.rstudio.org/2015/04/15/readxl-0-1-0/) - reading data from Excel
@@ -417,9 +418,9 @@ read.csv("./data/stations.csv") %>%
 Now we've seen the data, we can start to come up with some exploratory questions we might ask:
 
 * What are the top 5 journeys?
-* What is the average number of journeys per day of the week?
-* What is the average journey time for each day of the week?
 * What was the longest journey, how long was it, and when was it?
+* What is the average journey time for each day of the week?
+* What is the average number of journeys per day of the week?
 * Where does Jim live, and what are the coordinates of the station?
 
 Given what we have seen in the data, and what we know about how it is stored and structured, what might we need to do to address these questions?
@@ -757,30 +758,245 @@ So far so good, there's just one problem. What about dates where we touched in b
 
 ## lubridate - date manipulation
 
+We need to add a day. But we need a way to identify those dates first. We can use the cleaned up times to do this with some simple string matching:
+
+```{r get_after_midnight}
+after_midnight <- grep("00|01|02", substring(oyster$end.time.clean, 1, 2)) 
+```
+
+And then use `lubridate` to add a day:
+```{r add_day}
+oyster[after_midnight, "end.datetime"] <- 
+    oyster[after_midnight, "end.datetime"] + days(1)
+```
+
+Note that dplyr was _not_ used to do the manipulation for us. Sometimes base `R` is a little more compact, but perhaps less readable.
+
+## lubridate - date manipulation
+
+There are a few final things we might like to add to help us answer our questions:
+
+* a journey time:
+
+```{r add_journey_time}
+oyster <- oyster %>% mutate(journey.time = difftime(end.datetime, start.datetime, 
+                                                    units = "mins"))
+```
+
+* a day of the week for each journey:
+
+```{r add_weekdays}
+oyster <- oyster %>% mutate(journey.weekday = wday(date.clean, 
+                                                   label = TRUE, 
+                                                   abbr = FALSE))
+```
+
+## Answering the questions
+
+* <del>What are the top 5 journeys?</del>
+* __What was the longest journey, how long was it, and when was it?__
+* __What is the average journey time for each day of the week?__
+* __What is the average number of journeys per day of the week?__
+* Where does Jim live, and what are the coordinates of the station?
+
+Try to create the query you would need for each of these.
+
+## Longest journey
+
+```{r longest_journey, eval = FALSE}
+oyster %>% 
+    filter(journey.time == max(oyster$journey.time, na.rm = TRUE)) %>% 
+    select(journey.action, journey.time, date)
+```
+
+```{r longest_journey_show, echo = FALSE}
+oyster %>% 
+    filter(journey.time == max(oyster$journey.time, na.rm = T)) %>% 
+    select(journey.action, journey.time, date) %>% 
+    kable(col.names = c("Journey", "Duration", "Date"))
+```
+
+## Average journey time by day
+
+```{r avg_time_per_day, eval = FALSE}
+oyster %>% 
+    group_by(journey.weekday) %>% 
+    summarise(avg_time = floor(mean(journey.time, na.rm = TRUE)))
+```
+```{r avg_time_per_day_show, echo = FALSE}
+oyster %>% group_by(journey.weekday) %>% 
+    summarise(avg_time = floor(mean(journey.time, na.rm = TRUE))) %>%
+    filter(journey.weekday != "Sunday" & journey.weekday != "Saturday") %>% 
+    kable(col.names = c("Weekday", "Average journey time"))
+```
+
+## Average journeys per day
+```{r avg_journ_per_day, eval = FALSE}
+oyster %>% 
+    group_by(date.clean, journey.weekday) %>% summarise(journeys = n()) %>% 
+    group_by(journey.weekday) %>% summarise(avg_journeys = mean(journeys))
+```
+```{r, avg_journ_per_day_show, echo = FALSE}
+oyster %>% 
+    group_by(date.clean, journey.weekday) %>% 
+    summarise(journeys = n()) %>% 
+    group_by(journey.weekday) %>% 
+    summarise(avg_journeys = mean(journeys)) %>% 
+    filter(journey.weekday != "Saturday" & journey.weekday != "Sunday") %>% 
+    kable(col.names = c("Weekday", "Average number of journeys"))
+```
+
+# R-ounding off | Joins and tidy data
+
+## Where are we?
+
+So far we've looked at some standard data cleaning, manipulation and summarisation. But to get more from our analyses we might want to include _other_ data sources. In this example, we might want the station location data.
+
+```{r get_stations}
+stations <- read.csv("./data/stations.csv", stringsAsFactors = FALSE)
+```
+```{r show_stations_again, echo=FALSE}
+stations %>% head(3) %>% kable(col.names = c("Station", "Longitude", "Latitude"))
+```
+
 ## dplyr - joins
 
-The latest version of dplyr has also implemented a great set of `join` operations to facilitate even easier data manipulation directly in R:
+To combine the locations with the Oyster data we'll need a _join_.
+
+`dplyr` has also implemented a great set of `join` operations to facilitate even easier data manipulation directly in R:
 
 ```{r dplyrJoins, eval=FALSE}
 # Mutating joins - return all relevant rows from both tables
 left_join(data1, data2, by = "variable")
-
 right_join(data1, data2, by = "variable")
-
 inner_join(data1, data2, by = "variable")
-
 outer_join(data1, data2, by = "variable")
 
 # Filtering joins - return all relevant rows from the first table
 semi_join(data1, data2, by = "variable") # All rows in A that have matches in B
-
 anti_join(data1, data2, by = "varibale") # All rows in A that have no matches in B
+```
+
+## Checking our join keys
+
+For a join to work, the data we will use to match records together needs to... match.
+
+### Oyster data
+
+```{r show_oyster_cw, echo = FALSE}
+oyster %>% slice(grep("Canary", journey.action)) %>% 
+    head(2) %>% select(from, to) %>% 
+    kable()
+```
+
+***
+
+### Stations data
+
+```{r show_stations_cw, echo = FALSE}
+stations %>% slice(grep("Canary", station)) %>% head(2) %>% select(station, long, lat) %>% kable()
+```
+
+The join keys are not quite the same, so we'll need to do one last bit of cleaning.
+
+## A return to regular expressions
+
+There are other patterns in other station names that we might want to remove, e.g. "[London Underground]", "[Dlr]", or "(National Rail)".
+
+To find these patterns we can use a _regular expression_ - a simple way of expressing a pattern to search for:
+
+```{r build_cleaning_regex}
+regex <- "\\[.*\\]|\\(.*\\)| [Dd][Ll][Rr]"
+```
+
+Don't worry about learning regular expressions right away, just know that they can be incredibly useful for all sorts of things.
+
+We can use this with the `gsub` command, which is a bit like `grep` but will replace a pattern if it is found.
+```{r gsub_eg, eval=FALSE}
+gsub([pattern], [replacement], [where to look for the pattern])
+```
+
+## Cleaning up the station names
+
+We can use `gsub` and what we know from `dplyr` to clean up the station names in the Oyster data.
+
+```{r oyster_clean_stations}
+library(stringr)
+oyster <- oyster %>% 
+            mutate(from.clean = str_trim(gsub(regex, "", from)),
+                   to.clean = str_trim(gsub(regex, "", to)))
+```
+
+Note the `str_trim` function. It's from the `stringr` package and just trims excess whitespace from the  start and end of a string.
+
+## dplyr - Performing the join
+
+We should now be ready to join our data sets together. 
+
+```{r lj_1}
+oyster <- oyster %>% 
+            left_join(stations, by = c("from.clean" = "station")) %>% 
+            rename(from.long = long,
+                   from.lat = lat)
+```
+
+But we've got two stations to join, so we'll have to do it twice.
+
+```{r lj_2}
+oyster <- oyster %>% 
+            left_join(stations, by = c("to.clean" = "station")) %>% 
+            rename(to.long = long,
+                   to.lat = lat)
+```
+
+The `rename` function is also from `dplyr` and renames columns using a `new_name = old_name` syntax.
+
+## Answering the last question
+
+We now should have everything we need to answer the last question.
+
+* <del>What are the top 5 journeys?</del>
+* <del>What is the average number of journeys per day of the week?</del>
+* <del>What is the average journey time for each day of the week?</del>
+* <del>What was the longest journey, how long was it, and when was it?</del>
+* __Where does Jim live, and what are the coordinates of the station?__
+
+What query should we run?
+
+## Where does Jim live?
+
+```{r jim_live, eval=FALSE}
+oyster %>% 
+    group_by(from, from.long, from.lat) %>% 
+    summarise(visits = n()) %>% 
+    ungroup() %>% # ungroup removes the grouping and lets us sort the data
+    arrange(-visits)
+```
+```{r jim_live_show, eval=TRUE, echo = FALSE}
+oyster %>% 
+    group_by(from.clean, from.long, from.lat) %>% 
+    summarise(visits = n()) %>% 
+    ungroup() %>% 
+    arrange(-visits) %>% 
+    head(3) %>% 
+    kable(col.names = c("Station", "Longitude", "Latitude", "Visits"))
 ```
 
 # Closing R-marks
 
 ## Summary
 
+In this session we've gone through a brief introduction to data manipulation using R. We've covered:
+
+* Reading data in to R;
+* Quick looks at your data;
+* Simple data manipulations;
+* Data cleaning;
+* Working with dates;
+* Working with strings; and
+* Joining data together
+
+We've also covered the `%>%` piping paradigm which can help to create code that is clearer and easier to read. 
 
 ## Getting help - again
 
@@ -814,12 +1030,12 @@ There are loads of great sources of R information out there. Here are just a few
 
 ## Go fo-R it
 
-To close up the session, we want to reiterate how great we think R is. 
+To close up the session, here are a few things you might like to do figure out how to do with the data:
 
-* It's flexible, powerful and free.
-* It's the number one tool for data analysis in the world.
-* It's still growing.
-* It translates to "big data".
+* Peform all the cleaning we've discussed today in one, clean and tidy code file;
+* Create some exploratory plots using `ggplot2` - histograms of journey times, journeys over time, journey time vs. touch-in time; or
+* Plot station visits on a map;
+
 
 
 
