@@ -20,6 +20,11 @@ R is a widely used, open source language. It can be easily incorporated into mos
 
 As such, in this session we'll discuss how you can start doing some common data manipulation tasks using R. Whilst this won't make you an R wizard, it should give you some of the basic building blocks for starting to use R more widely.
 
+### Today's data:
+
+* __Oyster__: http://bit.ly/1SGu9xF
+* __Stations__: http://bit.ly/1lw3CZO
+
 ## Isn't R just for stats?
 
 Simply put: no.
@@ -103,7 +108,7 @@ is the equivalent of typing them in to the console.
 ## The bits that aren't for typing
 
 * __Environment__ - shows all objects (i.e. data) currently loaded in 
-to R. More on this later.
+to R.
 * __History__ - a list of recently executed R commands.
 * __Files__ - operates as a file browser, helping you navigate around your file system.
 * __Plots__ - displays any plots you've made from an R script or from the console.
@@ -116,7 +121,7 @@ RStudio projects are a great way to organise your work and keep things together.
 
 They can be created easily by clicking the drop down in the top right of your RStudio window and selecting "New project". You can choose to associate one with an existing folder/directory, or make one somewhere new.
 
-When you shut a project, anything you were working on will get re-opened the next time you shut a project, and your working directory will automatically get set to wherever the project is saved.
+When you shut a project, anything you were working on will get re-opened the next time you open the project, and your working directory will automatically get set to wherever the project is saved.
 
 ## Packages
 
@@ -140,6 +145,7 @@ library(magrittr)
 library(readxl)
 library(tidyr)
 library(lubridate)
+library(stringr)
 ```
 
 All of these packages were (co)created by [Hadley Wickham](http://had.co.nz/). His work is so prolific and popular that his approach to data analysis is known as the "hadleyverse" in the R community. He's also writing the most comprehensive [book](http://adv-r.had.co.nz/) on R out there.
@@ -155,7 +161,7 @@ R is no exception and there are a wealth of options for getting help:
 
 1. R help files: `?mean`, `?iris`
 2. R package vignettes - can see those available with `vignette()`
-3. [Google!](http://lmgtfy.com/?q=R+help) - but seriously this solves 
+3. [Google!](https://www.google.co.uk/#safe=off&q=r+help) - but seriously this solves 
  >99% of problems
 4. [StackOverflow](http://stackoverflow.com/questions/tagged/r)
 5. [Jim Leach](mailto:jim@thedatagent.com)
@@ -292,7 +298,7 @@ Your code will behave differently depending on the data type.
 ## Looking at your data
 
 ```{r get_oyster, echo = TRUE}
-oyster <- read.csv("./data/oyster_all_raw_20151113.csv")
+oyster <- read_csv("./data/oyster_all_raw_20151113.csv")
 ```
 
 The first thing most of us want to do with our data is to look at it. In R Studio we can accomplish this in a few ways.
@@ -537,7 +543,7 @@ oyster %>%
 
 ## dplyr - Arranging data
 
-Finally, something that is often useful is the `arragne` verb, which acts as the `ORDER BY`.
+Finally, something that is often useful is the `arrange` verb, which sorts data.
 
 ```{r dplyrArrange, eval = FALSE}
 arrange([data], [fields_to_order_by]) # general form
@@ -677,8 +683,8 @@ paste0(string1, string2, string3, ...) # paste things together with no space
 Combining this with `mutate` it's easy to add cleaned up fields:
 ```{r oyster_add_clean_times, eval = TRUE}
 oyster <- oyster %>% 
-            mutate(start.time.clean = start.time %>% paste0(":00"),
-                    end.time.clean = end.time %>% paste0(":00"))
+            mutate(start.time.clean = paste0(start.time, ":00"),
+                    end.time.clean = paste0(end.time, ":00"))
 ```
 
 ## tidyr - Splitting fields
@@ -716,7 +722,9 @@ This can be a bit finicky in R, so we'll turn to another package, `lubridate` to
 
 ## lubridate - working with dates
 
-The first thing we might want to do is to change the date to an actual date. `lubridate` provides an easy to remember syntax for this of the form `ymd()` (i.e. _year, month, day_). Changing the order of the `ymd` part will tell `lubridate` that our data is in a different format.
+The first thing we might want to do is to change the date to an actual date. `lubridate` provides an easy to remember syntax for this of the form `ymd()` (i.e. _year, month, day_). 
+
+Changing the order of the `ymd` part will tell `lubridate` that our data is in a different format.
 
 Looking at how we have received the data, it looks like we have a format similar to _day - month - year_. Combining this with some `dplyr` that we already know we can add a clean date field:
 
@@ -855,7 +863,7 @@ oyster %>%
 So far we've looked at some standard data cleaning, manipulation and summarisation. But to get more from our analyses we might want to include _other_ data sources. In this example, we might want the station location data.
 
 ```{r get_stations}
-stations <- read.csv("./data/stations.csv", stringsAsFactors = FALSE)
+stations <- read_csv("./data/stations.csv")
 ```
 ```{r show_stations_again, echo=FALSE}
 stations %>% head(3) %>% kable(col.names = c("Station", "Longitude", "Latitude"))
@@ -924,6 +932,7 @@ We can use `gsub` and what we know from `dplyr` to clean up the station names in
 
 ```{r oyster_clean_stations}
 library(stringr)
+regex <- "\\[.*\\]|\\(.*\\)| [Dd][Ll][Rr]"
 oyster <- oyster %>% 
             mutate(from.clean = str_trim(gsub(regex, "", from)),
                    to.clean = str_trim(gsub(regex, "", to)))
@@ -1006,7 +1015,7 @@ As we said at the beginning, there are lots of great sources of help for R probl
 
 1. R help files: `?mean`, `?iris`
 2. R package vignettes - can see those available with `vignette()`
-3. [Google!](http://lmgtfy.com/?q=R+help)
+3. [Google!](https://www.google.co.uk/#safe=off&q=r+help)
 
 ## Asking nicely
 
@@ -1034,10 +1043,12 @@ There are loads of great sources of R information out there. Here are just a few
 
 To close up the session, here are a few things you might like to do figure out how to do with the data:
 
-* Perform all the cleaning we've discussed today in one (or at most two) pipes, in a clean, tidy and commented code file;
-* Create some exploratory plots using `ggplot2` - histograms of journey times, journeys over time, journey time vs. touch-in time; 
-* Plot station visits on a map;or
-* Treat "from" and "to" as an adjacency list, make an adjacency matrix, plot and analyse the (directed) network.
+* Perform all the cleaning we've discussed today in one (or at most two) pipe in a tidy and commented code file;
+* Create some exploratory tables and plots with `dplyr` and `ggplot2`;
+* Put your exploratory analysis in to an `Rmarkdown` report made using `knitr` in Rstudio;
+* Plot station visits on an interactive map with the `leaflet` package;
+* Treat "from" and "to" as an adjacency list, plot and analyse the (directed) network with the `igraph` package; or
+* Look at the `Shiny` app I made with the data [here](https://jleach.shinyapps.io/oyster), read about how I made it on my [blog](http://www.thedatagent.com/tflapprelease1/) and contribute to it via the [GitHub repository](https://github.com/Jim89/oyster).
 
 
 
