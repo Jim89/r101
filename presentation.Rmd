@@ -22,7 +22,7 @@ As such, in this session we'll discuss how you can start doing some common data 
 
 ### Today's data:
 
-* __Oyster__: http://bit.ly/1SGu9xF
+* __Oyster__: http://bit.ly/1nJ2jaS
 * __Stations__: http://bit.ly/1lw3CZO
 
 ## Isn't R just for stats?
@@ -220,7 +220,7 @@ data <- read_csv("[some data].csv", col_names = TRUE, skip = 0, col_types = NULL
 
 Generally, `read_csv` only needs you to specify the file path, the other options (e.g. header row true/false) are taken care of for you.
 
-Try reading the `oyster_all_raw_20151113.csv` data file in to R.
+Try reading the `oyster_all_raw_20160125.csv` data file in to R.
 
 ## Reading from other flat file sources
 
@@ -298,7 +298,7 @@ Your code will behave differently depending on the data type.
 ## Looking at your data
 
 ```{r get_oyster, echo = TRUE}
-oyster <- read_csv("./data/oyster_all_raw_20151113.csv")
+oyster <- read_csv("./data/oyster_all_raw_20160125.csv")
 ```
 
 The first thing most of us want to do with our data is to look at it. In R Studio we can accomplish this in a few ways.
