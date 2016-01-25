@@ -1,0 +1,437 @@
+---
+title: "R 101"
+subtitle: "Session 2: Data manipulation with R"
+author: "" 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow   # 
+output: 
+    ioslides_presentation:
+        logo: "./resources/images/icdss.jpg"
+        css: "./resources/css/styles.css"
+mode: selfcontained
+widescreen: true
+---
+# Introduction
+
+```{r load_packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(magrittr)
+library(readxl)
+library(tidyr)
+library(lubridate)
+library(stringr)
+library(knitr)
+```
+
+```{r get_oyster, echo = FALSE}
+oyster <- read_csv("./data/oyster_all_raw_20160125.csv")
+names(oyster) <- tolower(names(oyster))
+
+badRecords <- "Topped-up|Season ticket|Unspecified location"
+
+# grep([what to search], [where to search for it])
+records <- grep(badRecords, oyster$journey.action) 
+
+oyster <- oyster %>% slice(-records)
+
+oyster <- oyster %>% 
+          mutate(start.time.clean = paste0(start.time, ":00"),
+                 end.time.clean = paste0(end.time, ":00"))
+
+oyster <- oyster %>% 
+          separate(col = journey.action, 
+                   into = c("from", "to"), 
+                   sep = " to ", 
+                   remove = FALSE)
+
+oyster <- oyster %>% mutate(date.clean = dmy(date))
+
+oyster <- oyster %>% 
+    mutate(start.datetime = paste(date, start.time.clean, sep = " "),
+           end.datetime = paste(date, end.time.clean, sep = " "))
+
+oyster <- oyster %>% 
+          mutate(start.datetime = dmy_hms(start.datetime),
+                 end.datetime = dmy_hms(end.datetime))
+
+afterMidnightSrt <- grep("00|01|02", substring(oyster$start.time,1,2))
+afterMidnightEnd <- grep("00|01|02", substring(oyster$end.time,1,2))
+afterMidnight <- afterMidnightEnd[!(afterMidnightEnd == afterMidnightSrt)] 
+
+oyster[afterMidnight, "end.datetime"] <- 
+    oyster[afterMidnight, "end.datetime"] + days(1)
+
+oyster <- oyster %>% 
+          mutate(journey.time = difftime(end.datetime, start.datetime, units = "mins"))
+
+oyster <- oyster %>% mutate(journey.weekday = wday(date.clean, 
+                                                   label = TRUE, 
+                                                   abbr = FALSE))
+```
+
+## Introduction
+
+In the last session we covered data cleansing, manipulation and aggregation. Today we're going to wrap up our data preparation steps and then get stuck in to making some graphs and visualisations.
+
+### Today's data:
+
+* __Oyster__: http://bit.ly/1nJ2jaS
+* __Stations__: http://bit.ly/1lw3CZO
+* __These slides__:
+
+## A quick look at the data - again
+
+Let's just re-familiarise ourselves with the data again.
+
+```{r show_oyster2, echo = FALSE}
+library(knitr)
+oyster %>% tail(5, addrownums = FALSE) %>% kable()
+```
+
+## A quick look at the data - again
+
+```{r show_stations2, echo = FALSE}
+library(knitr)
+read.csv("./data/stations.csv") %>% 
+    filter(station %in% c("Richmond", "Canary Wharf", "South Kensington", "Bank",
+                          "Whitechapel", "Algate East")) %>% 
+    head(6) %>% kable()
+```
+
+## Some questions to ask of the data
+
+Now we've seen the data, we can start to come up with some exploratory questions we might ask:
+
+* <del>What are the top 5 journeys?<\del>
+* <del>What was the longest journey, how long was it, and when was it?<\del>
+* <del>What is the average journey time for each day of the week?<\del>
+* <del>What is the average number of journeys per day of the week?<\del>
+* Where does Jim live, and what are the coordinates of the station?
+
+# R-ounding off | Joins and tidy data
+
+## Where are we?
+
+So far we've looked at some standard data cleaning, manipulation and summarisation. But to get more from our analyses we might want to include _other_ data sources. In this example, we might want the station location data.
+
+```{r get_stations}
+stations <- read_csv("./data/stations.csv")
+```
+```{r show_stations_again, echo=FALSE}
+stations %>% head(3) %>% kable(col.names = c("Station", "Longitude", "Latitude"))
+```
+
+## The basics of joining data together
+
+When we join two (or more) tables of data together we need them to share some data in common. This is usually a column (or columns) that appears in both tables that can be used to link them together. 
+
+Such common columns are referred to as join _keys_ and are important to know about when combining data sets together. In order for a join to work properly, the join keys must be exactly the same. 
+
+Hadley Wickham has (yet again!) provided some excellent reference material to help you understand all the different types of join out there. You can check it out [here](http://r4ds.had.co.nz/relational-data.html).
+
+Today we'll be focussing on something called the "left join". Let's just draw a simple Venn diagram of what that means. 
+
+## dplyr - joins
+
+To combine the locations with the Oyster data we'll need a _join_.
+
+`dplyr` has implemented a great set of `join` operations to facilitate easy data manipulation directly in R:
+    
+    ```{r dplyrJoins, eval=FALSE}
+# Mutating joins - return all relevant rows from both tables
+left_join(data1, data2, by = "variable")
+right_join(data1, data2, by = "variable")
+inner_join(data1, data2, by = "variable")
+outer_join(data1, data2, by = "variable")
+
+# Filtering joins - return all relevant rows from the first table
+semi_join(data1, data2, by = "variable") # All rows in A that have matches in B
+anti_join(data1, data2, by = "varibale") # All rows in A that have no matches in B
+```
+
+## Checking our join keys
+
+For a join to work, the data we will use to match records together needs to... match.
+
+### Oyster data
+
+```{r show_oyster_cw, echo = FALSE}
+oyster %>% slice(grep("Canary", journey.action)) %>% 
+    head(2) %>% select(from, to) %>% 
+    kable()
+```
+
+***
+    
+### Stations data
+    
+    ```{r show_stations_cw, echo = FALSE}
+stations %>% 
+  slice(grep("Canary", station)) %>% 
+  head(2) %>% 
+  select(station, long, lat) %>% 
+  kable()
+```
+
+The join keys are not quite the same, so we'll need to do one last bit of cleaning.
+
+## A return to regular expressions
+
+There are other patterns in other station names that we might want to remove, e.g. "[London Underground]", "[Dlr]", or "(National Rail)".
+
+To find these patterns we can use a more complex _regular expression_ - a simple way of expressing a pattern to search for:
+
+```{r build_cleaning_regex}
+regex <- "\\[.*\\]|\\(.*\\)| [Dd][Ll][Rr]"
+```
+
+Don't worry about learning regular expressions right away, just know that they can be incredibly useful for all sorts of things.
+
+We can use this with the `gsub` command, which is a bit like `grep` but will replace a pattern if it is found.
+```{r gsub_eg, eval=FALSE}
+gsub([pattern], [replacement], [where to look for the pattern])
+```
+
+## Cleaning up the station names
+
+We can use `gsub` and what we know from `dplyr` to clean up the station names in the Oyster data.
+
+```{r oyster_clean_stations}
+library(stringr)
+regex <- "\\[.*\\]|\\(.*\\)| [Dd][Ll][Rr]"
+oyster <- oyster %>% 
+    mutate(from.clean = str_trim(gsub(regex, "", from)),
+           to.clean = str_trim(gsub(regex, "", to)))
+```
+
+Note the `str_trim` function. It's from the `stringr` package and just trims excess whitespace from the start and end of a string.
+
+## dplyr - Performing the join
+
+We should now be ready to join our data sets together. 
+
+```{r lj_1}
+oyster <- oyster %>% 
+          left_join(stations, by = c("from.clean" = "station")) %>% 
+          rename(from.long = long,
+                 from.lat = lat)
+```
+
+But we've got two stations to join, so we'll have to do it twice.
+
+```{r lj_2}
+oyster <- oyster %>% 
+          left_join(stations, by = c("to.clean" = "station")) %>% 
+          rename(to.long = long,
+                 to.lat = lat)
+```
+
+The `rename` function is also from `dplyr` and renames columns using a `new_name = old_name` syntax.
+
+## Answering the last question
+
+We now should have everything we need to answer the last question.
+
+* <del>What are the top 5 journeys?</del>
+* <del>What is the average number of journeys per day of the week?</del>
+* <del>What is the average journey time for each day of the week?</del>
+* <del>What was the longest journey, how long was it, and when was it?</del>
+* __Where does Jim live, and what are the coordinates of the station?__
+
+What query should we run?
+
+## Where does Jim live?
+
+```{r jim_live, eval=FALSE}
+oyster %>% 
+group_by(from, from.long, from.lat) %>% 
+summarise(visits = n()) %>% 
+ungroup() %>% # ungroup removes the grouping and lets us sort the data
+arrange(-visits)
+```
+```{r jim_live_show, eval=TRUE, echo = FALSE}
+oyster %>% 
+  group_by(from.clean, from.long, from.lat) %>% 
+  summarise(visits = n()) %>% 
+  ungroup() %>% 
+  arrange(-visits) %>% 
+  head(3) %>% 
+  kable(col.names = c("Station", "Longitude", "Latitude", "Visits"))
+```
+
+# Visualisations
+
+## Packages
+
+Now that we have a tidy data set to use, we're going to explore some simple ways to visualise this data. We'll be relying on a few new packages, namely:
+
+* `ggplot2`
+* `leaflet`
+* `networkD3`
+
+We'll start with some simple static plots and then move on to some interactive visualisations.
+
+# ggplot2
+
+# leaflet
+
+## An introduction to leaflet
+
+`leaftlet` is actually a `JavaScript` library for creating interactive maps. The `R` package hides the `JS` underneath some easy-to-learn `R` functions and makes charting easy.
+
+`leaflet` is great as it is lightweight, and supported by most browsers and desktop/mobile operating systems. This makes it great for creating shareable material from your analyses.
+
+Here we're going to use it to plot station visits on a map.
+
+## Creating another summary
+
+To help us out with our map, we'll create a tidy data set that summarises how often each station gets visited.
+
+```{r visits}
+vistited <- oyster %>%
+            select(from, from.long, from.lat) %>%
+            setNames(c("station", "longitude", "latitude")) %>%
+            rbind(oyster %>%
+                  select(to, to.long, to.lat) %>%
+                  setNames(c("station", "longitude", "latitude"))) %>%
+            group_by(station, longitude, latitude) %>%
+            summarise(visits = n()) %>%
+            filter(!is.na((longitude)))
+```
+
+## Creating the map
+
+```{r makeLeaflet, message = FALSE, eval = FALSE}
+library(leaflet)
+vistited %>%
+  leaflet() %>%
+  addTiles() %>% 
+  addCircles(radius = visits, stroke = T, fillOpacity = 0.75)
+```
+
+This code is all that is needed to make an interactive map. We first take our data summary and pass it to the `leaflet` function. Then, we add tiles (i.e. the map background) and then we add circles based on our data. 
+
+Maps like this can be a great way to explore interrogate geographical data. And if geography is important to your results, a map can really help demonstrate this.
+
+## Reviewing the map {.flexbox .vcenter}
+
+```{r showLeaflet, message = FALSE, echo = FALSE}
+library(leaflet)
+vistited %>%
+  leaflet() %>%
+  addTiles() %>% 
+  addCircles(radius = ~2.2*visits, stroke = T, fillOpacity = 0.75)
+```
+
+# networkD3
+
+## An introduction to networkD3
+
+`NetworkD3` is another new `R` package that creates `d3.js`-based, interactive network diagrams. It might seem strange to visualise these data as a network, but in a way they are. 
+
+Journies are made from nodes in the network to other nodes in the network (i.e. station to station) and we can start to imagine this in terms of a network dataset. 
+
+Whilst the data for just _one_ traveller on the underground are not particularly interesting, if we had access to _everyone's_ data, then we would have a really interesting network data set to investigate. Let's make a simple network plot.
+
+## Creating another summary
+
+```{r networkd3_summary}
+network_summary <- oyster %>% 
+                    group_by(from.clean, to.clean) %>% 
+                    tally() 
+```
+
+## Creating the network diagram
+
+```{r makenetwork, message = FALSE, eval = FALSE}
+library(networkD3)
+network_summary %>%
+  simpleNetwork(zoom = TRUE)
+```
+
+## Reviewing the network {.flexbox .vcenter}
+
+```{r shownetwork, message = FALSE, echo = FALSE}
+library(networkD3)
+network_summary %>%
+  simpleNetwork(zoom = TRUE)
+```
+
+Again, this simple snippet is all that's needed to create an interactive network diagram. 
+
+This package is still in its early life, so there are lots of features missing, but immediately we can look at the plot, explore it, and start to tell a story. 
+
+# Go fo-R it
+
+## Shiny App
+
+`Shiny` is a framework from RStudio that makes it really easy to make web apps based on your data. I made one with my Oyster data and you can find it online [here](https://jleach.shinyapps.io/oyster). Let's have a look and tell some stories.
+
+You can also read about how I made it on my [blog](http://www.thedatagent.com/tflapprelease1/) and contribute to it via the [GitHub repository](https://github.com/Jim89/oyster) if that's something you're interested in.
+
+# Closing R-marks
+
+## Summary
+
+In these last few sessions we've gone through a lot. We've covered:
+
+* An introduction to R;
+* Reading data in;
+* Quick looks at your data;
+* Simple data manipulations;
+* Data cleaning;
+* Working with dates;
+* Working with strings; 
+* joining data together; and
+* Some interesting visualisations we can make.
+
+## Getting help - again
+
+As we said at the beginning, there are lots of great sources of help for R problems. The top 3 are probably:
+    
+1. R help files: `?mean`, `?iris`
+2. R package vignettes - can see those available with `vignette()`
+3. [Google!](https://www.google.co.uk/#safe=off&q=r+help)
+                 
+## Asking nicely
+                 
+If you really have a problem that you can't solve yourself remember to:
+             
+1. Be explicit - state your problem in detail.
+2. Describe the goal of your analysis - not the programming steps you're taking.
+3. Provide reproducible examples - simulate the data if needs be.
+4. Provide your hardware/software set up.
+
+## More R-esources
+
+There are loads of great sources of R information out there. Here are just a few:
+
+* [CRAN](http://cran.r-project.org/doc/manuals/R-intro.pdf)
+* [Coursera](https://www.coursera.org/specialization/jhudatascience/1?utm_medium=listingPage)
+* [DataCamp](https://www.datacamp.com/)
+* [Books](http://www.burns-stat.com/documents/tutorials/impatient-r/)
+* [More books](http://www.burns-stat.com/documents/books/the-r-inferno/)
+* [Even more books](http://adv-r.had.co.nz/)
+* [R-Bloggers](http://www.r-bloggers.com/)
+
+## Prize 
+
+To keep you going and learning with R, ICDSS are kindly sponsoring a small prize based on these workshops. What they're looking for is an exploratory data analysis that tells a story about the Oyster data.
+
+You can use any of the techniques we've covered in the sessions, and anything else that you find online that you want as well. Responses can be in any format (we'd suggest investigating the `RMarkdown` reporting structure that RStudio have released) and focus on any aspect of the data that you'd like. Feel free to use the Shiny app we reviewed earlier as inspriration.
+
+Whilst there is a small prize, the main aim of this exercise is to give you some practice using R with some "real-life" messy data, and maybe something that you can then share with others afterwards. So don't stress too much about it, have fun, learn, and tell any story that you want to with the data. 
+
+# Q&A
+
+
+
+
+
+
+
+
+
+
