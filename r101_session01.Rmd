@@ -454,6 +454,14 @@ Or use "negative selection" to take everything _except_ certain rows/columns:
 oyster[-(1:10), ]
 ```
 
+***
+
+Or specify an exact column name in " quotation marks if we know it:
+
+```{r brack_eg4, eval = FALSE}
+oyster[ , "journey.action"]
+```
+
 ## A quick note on auto-printing an assignment
 
 If you run any of the commands on the previous couple of slides, you'll see that `R` usually just _prints_ the answer to the console.
