@@ -1,6 +1,6 @@
 ---
 title: "R 101"
-subtitle: "Session 2: Data manipulation with R"
+subtitle: "Session 3: Joining data and making plots"
 author: "" 
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
@@ -23,9 +23,10 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 library(knitr)
+library(networkD3)
 ```
 
-```{r get_oyster, echo = FALSE}
+```{r get_oyster, echo = FALSE, message = FALSE, warning = FALSE}
 oyster <- read_csv("./data/oyster_all_raw_20160125.csv")
 names(oyster) <- tolower(names(oyster))
 
@@ -87,7 +88,9 @@ Let's just re-familiarise ourselves with the data again.
 
 ```{r show_oyster2, echo = FALSE}
 library(knitr)
-oyster %>% tail(5, addrownums = FALSE) %>% kable()
+oyster %>% 
+  select(1:4, 7:10) %>% 
+  tail(5, addrownums = FALSE) %>% kable()
 ```
 
 ## A quick look at the data - again
@@ -105,9 +108,9 @@ read.csv("./data/stations.csv") %>%
 Now we've seen the data, we can start to come up with some exploratory questions we might ask:
 
 * <del>What are the top 5 journeys?<\del>
-* <del>What was the longest journey, how long was it, and when was it?<\del>
-* <del>What is the average journey time for each day of the week?<\del>
-* <del>What is the average number of journeys per day of the week?<\del>
+* <del>What was the longest journey, how long was it, and when was it?</del>
+* <del>What is the average journey time for each day of the week?</del>
+* <del>What is the average number of journeys per day of the week?</del>
 * Where does Jim live, and what are the coordinates of the station?
 
 # R-ounding off | Joins and tidy data
@@ -139,7 +142,7 @@ To combine the locations with the Oyster data we'll need a _join_.
 
 `dplyr` has implemented a great set of `join` operations to facilitate easy data manipulation directly in R:
     
-    ```{r dplyrJoins, eval=FALSE}
+```{r dplyrJoins, eval=FALSE}
 # Mutating joins - return all relevant rows from both tables
 left_join(data1, data2, by = "variable")
 right_join(data1, data2, by = "variable")
@@ -167,7 +170,7 @@ oyster %>% slice(grep("Canary", journey.action)) %>%
     
 ### Stations data
     
-    ```{r show_stations_cw, echo = FALSE}
+```{r show_stations_cw, echo = FALSE}
 stations %>% 
   slice(grep("Canary", station)) %>% 
   head(2) %>% 
@@ -275,6 +278,154 @@ We'll start with some simple static plots and then move on to some interactive v
 
 # ggplot2
 
+## ggplot2 - An introduction
+
+> __“The emphasis in ggplot2 is reducing the amount of thinking time by making it easier to go from the plot in your brain to the plot on the page.”__
+
+<br>
+
+`ggplot2` is a brilliant data visualisation library, also created by Hadley Wickham. 
+
+It follows and implements the principles set out in the book "A Grammar of Graphics" by Leland Wilkinson.
+
+Whilst the syntax for more complicated plots can be tricky to understand at first, once you master it it becomes a fabulous tool for creating beautiful and elegant plots.
+
+## qplot
+
+Today we'll be focussing on the most simple function in the `ggplot2` package.
+
+Its name is `qplot()` ("quick-plot") and it combines most of the functionality of `ggplot2` in an easy-to-learn way. 
+
+Let's start by loading the library.
+
+```{r load_ggplot2}
+library(ggplot2)
+```
+
+## A simple histogram {.flexbox .vcenter}
+
+Lets start with one of the most basic plots, a histogram. For this we just need some data and and x-value:
+
+```{r qplot_hist, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6.5}
+qplot(x = as.numeric(journey.time), data = oyster)
+```
+
+## A simple histogram {.flexbox .vcenter}
+
+That's ok, but the labels are horrible, so let's change them, and add a title. We can do that with the `xlab`, `ylab`, and `main` arguments:
+
+```{r qplot_hist_labelled, message = FALSE, warning = FALSE, fig.height = 3.5, fig.width = 6.5}
+qplot(x = as.numeric(journey.time), data = oyster, main = "Histogram of journey times", 
+      xlab = "Journey time (mins)", ylab = "Count")
+```
+
+## A simple histogram {.flexbox .vcenter}
+
+Lets add some colour to make it look a little prettier. We do this with the `fill` argument when we're _filling_ in an area and `colour` to colour in lines or points.
+
+```{r qplot_hist_labelled_filled, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 6.5}
+qplot(x = as.numeric(journey.time), data = oyster, main = "Histogram of journey times", 
+      xlab = "Journey time (mins)", ylab = "Count", fill = I("steelblue"), 
+      colour = I("white"))
+```
+
+## A scatter plot
+
+Another common visualisation is the scatter plot, for when we want to look at the relationship between two numeric variables. Lets look at the relationship between journey time and price.
+
+Firstly, we'll need to cut out the 0-charge journeys.
+
+```{r subset_oyster}
+oyster_charged <- oyster %>% 
+                  filter(charge != 0)
+```
+
+## A scatter plot {.flexbox .vcenter}
+
+It's then easy to create the scatter plot with `qplot`. Note that a scatter plot is the default for two numeric fields.
+
+```{r scatter, fig.height = 4, fig.width =6, warning = FALSE, message= FALSE}
+qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
+      xlab = "Journey time(mins)", ylab = "Charge (£)")
+```
+
+## A scatter plot {.flexbox .vcenter}
+
+To get sense of the relationship, we can also add a smoother using the `geom` argument:
+
+```{r scatter2 , fig.height = 3.5, fig.width =6, warning = FALSE, message= FALSE}
+qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
+      xlab = "Journey time(mins)", ylab = "Charge (£)", geom = "smooth")
+```
+
+## A scatter plot {.flexbox .vcenter}
+
+Where have the points gone?! We only told `qplot` to display a smoother, we also need to tell it to display the points too:
+
+```{r scatter3, fig.height=3.5, fig.width=6, warning = FALSE, message= FALSE}
+qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
+      xlab = "Journey time(mins)", ylab = "Charge (£)", geom = c("point", "smooth"))
+```
+
+## A scatter plot {.flexbox .vcenter}
+
+We might also want to colour and/or shape the points depending on which day of the week the journey was on. Easily done with the `shape` and `colour` arguments (we'll remove the smoother for now).
+
+```{r scatter4, fig.height=3, fig.width=6, warning = FALSE, message= FALSE}
+qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
+      xlab = "Journey time(mins)", ylab = "Charge (£)", geom = c("point"),
+      shape = journey.weekday, colour = journey.weekday)
+```
+
+## A note on colour and shape
+
+We can use fields in our data to colour our plots in a really useful way.
+
+However, if we want to just _set_ the colour to be something specific, we need to wrap our choice of colour in the `I()` (identity) operator.
+
+A full list of 657 built-in R colours can be found [here](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf). You can also get palettes of colour from the `RColorBrewer` package, or create your own from _RGB_ values.
+
+## Box-plots {.flexbox .vcenter}
+
+Boxplots can be great for understanding how a numerical value is distributed within a group. We can create one using the "boxplot" `geom`.
+
+```{r boxplot, fig.height= 3.5, fig.width=6, warning=FALSE, message=FALSE}
+qplot(x = journey.weekday, y = as.numeric(journey.time), 
+      data = oyster, geom = "boxplot", ylab = "Journey time (mins)")
+```
+
+## Creating another summary
+
+To help us understand which stations we visit most, we'll create a new data set that summarises how often each station gets visited.
+
+```{r visits}
+visited <- oyster %>%
+            select(from, from.long, from.lat) %>%
+            setNames(c("station", "longitude", "latitude")) %>%
+            rbind(oyster %>%
+                  select(to, to.long, to.lat) %>%
+                  setNames(c("station", "longitude", "latitude"))) %>%
+            group_by(station, longitude, latitude) %>%
+            summarise(visits = n()) %>%
+            filter(visits >= 10) %>% 
+            ungroup() %>% 
+            arrange(desc(visits))
+```
+
+## Barcharts {.flexbox .vcenter}
+
+We can then create a bar chart using the "bar" `geom`. We also need to specify the `stat` argument to be "identity". This tells `qplot` to treat the data as-is, and not to transform it at all (otherwise it tried to do a histogram).
+
+```{r barplot, message = FALSE, fig.height=3.5, fig.width=8}
+qplot(x = station, y = visits, data = visited, geom = "bar", stat = "identity")
+```
+
+## The limits of qplot
+
+We're getting to the limits of what `qplot` can achieve for now. Further tweaks will require us to use the `ggplot()` function itself. This is more complex and beyond the scope of this session, but if you're interested check out the excellent [documentation](http://docs.ggplot2.org/current/).
+
+For now, we'll move on to some other interesting visualisations.
+
 # leaflet
 
 ## An introduction to leaflet
@@ -285,12 +436,12 @@ We'll start with some simple static plots and then move on to some interactive v
 
 Here we're going to use it to plot station visits on a map.
 
-## Creating another summary
+## Using our summary
 
-To help us out with our map, we'll create a tidy data set that summarises how often each station gets visited.
+To help us out with our map, we'll use the data set that summarises how often each station gets visited, but this time without the filter.
 
-```{r visits}
-vistited <- oyster %>%
+```{r visits2, eval = TRUE}
+visited <- oyster %>%
             select(from, from.long, from.lat) %>%
             setNames(c("station", "longitude", "latitude")) %>%
             rbind(oyster %>%
@@ -305,10 +456,10 @@ vistited <- oyster %>%
 
 ```{r makeLeaflet, message = FALSE, eval = FALSE}
 library(leaflet)
-vistited %>%
+visited %>%
   leaflet() %>%
   addTiles() %>% 
-  addCircles(radius = visits, stroke = T, fillOpacity = 0.75)
+  addCircles(radius = 2.5*visits, stroke = T, fillOpacity = 0.75)
 ```
 
 This code is all that is needed to make an interactive map. We first take our data summary and pass it to the `leaflet` function. Then, we add tiles (i.e. the map background) and then we add circles based on our data. 
@@ -319,7 +470,7 @@ Maps like this can be a great way to explore interrogate geographical data. And 
 
 ```{r showLeaflet, message = FALSE, echo = FALSE}
 library(leaflet)
-vistited %>%
+visited %>%
   leaflet() %>%
   addTiles() %>% 
   addCircles(radius = ~2.2*visits, stroke = T, fillOpacity = 0.75)
@@ -331,37 +482,33 @@ vistited %>%
 
 `NetworkD3` is another new `R` package that creates `d3.js`-based, interactive network diagrams. It might seem strange to visualise these data as a network, but in a way they are. 
 
-Journies are made from nodes in the network to other nodes in the network (i.e. station to station) and we can start to imagine this in terms of a network dataset. 
+Journeys are made from nodes in the network to other nodes in the network (i.e. station to station) and we can start to imagine this in terms of a network dataset. 
 
-Whilst the data for just _one_ traveller on the underground are not particularly interesting, if we had access to _everyone's_ data, then we would have a really interesting network data set to investigate. Let's make a simple network plot.
-
-## Creating another summary
-
-```{r networkd3_summary}
-network_summary <- oyster %>% 
-                    group_by(from.clean, to.clean) %>% 
-                    tally() 
-```
+Whilst the data for just _one_ traveler on the underground are not particularly interesting, if we had access to _everyone's_ data, then we would have a really interesting network data set to investigate. Let's make a simple network plot.
 
 ## Creating the network diagram
 
 ```{r makenetwork, message = FALSE, eval = FALSE}
 library(networkD3)
-network_summary %>%
-  simpleNetwork(zoom = TRUE)
-```
 
-## Reviewing the network {.flexbox .vcenter}
-
-```{r shownetwork, message = FALSE, echo = FALSE}
-library(networkD3)
-network_summary %>%
+oyster %>% 
+  group_by(from.clean, to.clean) %>% 
+  tally()  %>% 
   simpleNetwork(zoom = TRUE)
 ```
 
 Again, this simple snippet is all that's needed to create an interactive network diagram. 
 
-This package is still in its early life, so there are lots of features missing, but immediately we can look at the plot, explore it, and start to tell a story. 
+This package is still in its early life, so there are lots of features missing, but immediately we can look at the plot, explore it, and start to tell a story.
+
+## Reviewing the network {.flexbox .vcenter}
+
+```{r shownetwork, message = FALSE, echo = FALSE}
+oyster %>% 
+  group_by(from.clean, to.clean) %>% 
+  tally()  %>% 
+  simpleNetwork(zoom = TRUE)
+```
 
 # Go fo-R it
 
@@ -420,7 +567,7 @@ There are loads of great sources of R information out there. Here are just a few
 
 To keep you going and learning with R, ICDSS are kindly sponsoring a small prize based on these workshops. What they're looking for is an exploratory data analysis that tells a story about the Oyster data.
 
-You can use any of the techniques we've covered in the sessions, and anything else that you find online that you want as well. Responses can be in any format (we'd suggest investigating the `RMarkdown` reporting structure that RStudio have released) and focus on any aspect of the data that you'd like. Feel free to use the Shiny app we reviewed earlier as inspriration.
+You can use any of the techniques we've covered in the sessions, and anything else that you find online that you want as well. Responses can be in any format (we'd suggest investigating the `RMarkdown` reporting structure that RStudio have released) and focus on any aspect of the data that you'd like. Feel free to use the Shiny app we reviewed earlier as inspiration.
 
 Whilst there is a small prize, the main aim of this exercise is to give you some practice using R with some "real-life" messy data, and maybe something that you can then share with others afterwards. So don't stress too much about it, have fun, learn, and tell any story that you want to with the data. 
 
