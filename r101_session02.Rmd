@@ -34,7 +34,7 @@ names(oyster) <- tolower(names(oyster))
 
 In the last session we covered an introduction to R, reading data in, basic checks and summaries on your data and some of the terminology that will be helpful for the next couple of sessions.
 
-Today we'll be going a bit deeper and looking at data manipulation and aggregation. We're going to focus heavily on the [dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package and get in to to some of the gritty realities of working with data.
+Today we'll be going a bit deeper and looking at data manipulation and aggregation. We're going to focus heavily on the [dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package and get in to some of the gritty realities of working with data.
 
 ### Today's data:
 
@@ -83,6 +83,8 @@ library(magrittr)
 some_data %>% some_function
 ```
 can be read as "take some_data, __then__ perform some function on it".
+
+## Pro-tip - piping your operations
 
 To get specific, the left hand side of `%>%` is *piped* into the first argument of the function on the right hand side. There are a few restrictions on exactly what you can *pipe* in to what, but for our purposes this is a good rule of thumb. You can insert them in to your code with shortcut `CTRL+SHIFT+M` (Windows) or `CMD+SHFT+M` (Mac).
 
@@ -216,11 +218,11 @@ Now we've seen the individual functions, we can use the `%>%` operator to create
 
 ```{r dplyrChain, eval=TRUE}
 oyster_summary <- oyster %>% 
-group_by(journey.action) %>% 
-summarise(journeys = n()) %>%
-ungroup() %>%     
-arrange(-journeys) %>% 
-head(5)
+                  group_by(journey.action) %>% 
+                  summarise(journeys = n()) %>%
+                  ungroup() %>%     
+                  arrange(-journeys) %>% 
+                  head(5)
 ```
 
 ## The output
