@@ -79,3 +79,97 @@ oyster_summary <- oyster %>%
                   ungroup() %>%     
                   arrange(-journeys) %>% 
                   head(5)
+
+# Step 5 - Removing duff data --------------------------------------------------
+# A quick example of slice - selecting rows based on numbers
+oyster %>% slice(1:10)
+
+# Set up the pattern to search for
+badRecords <- "Topped-up|Season ticket|Unspecified location"
+
+# Search for those patterns
+records <- grep(badRecords, oyster$journey.action) 
+
+# Check what grep does:
+records
+
+# Use slice to cut out the bad records (note that this "updates" the oyster object)
+oyster <- oyster %>% slice(-records)
+
+# Step 6 - Adding fields -------------------------------------------------------
+# Set up a new field with a constant value
+oyster %>%  mutate(newField = 4)
+
+# Set up new field(s) from existing fields
+oyster %>% mutate(cost_plus_bal = charge + balance, # add charge to balance
+                  cost_plus_bal_clean = sum(charge, balance, na.rm = TRUE)) # clean up
+
+# Set up new fields with conditional logic
+oyster %>% mutate(no_cost = ifelse(charge == 0 | is.na(charge), 1, 0))
+
+# Add variables to update the data
+oyster <- oyster %>% 
+          mutate(start.time.clean = paste0(start.time, ":00"), # Create a start time field
+                 end.time.clean = paste0(end.time, ":00")) # Create a end time field
+
+# Split up existing fields in to new ones
+oyster <- oyster %>% 
+          separate(col = journey.action, 
+                   into = c("from", "to"), 
+                   sep = " to ", 
+                   remove = FALSE)
+
+# Step 7 - working with dates --------------------------------------------------
+# Turn text that looks like a date in to an actual date
+oyster <- oyster %>% mutate(date.clean = dmy(date))
+
+# Add some text date-times
+oyster <- oyster %>% 
+          mutate(start.datetime = paste(date, start.time.clean, sep = " "),
+                 end.datetime = paste(date, end.time.clean, sep = " "))
+
+# And then turn them in to actual datetimes (note mutate also updates fields)
+oyster <- oyster %>% 
+          mutate(start.datetime = dmy_hms(start.datetime),
+                 end.datetime = dmy_hms(end.datetime))
+
+# Date manipulation - identify dates with journeys around midnight ------
+# Find all the times a journey started after midnight
+afterMidnightSrt <- grep("00|01|02", substring(oyster$start.time,1,2))
+
+# Find all the times a journey ended after midnight
+afterMidnightEnd <- grep("00|01|02", substring(oyster$end.time,1,2))
+
+# Find the records starting before midnight but ending after
+afterMidnight <- afterMidnightEnd[!(afterMidnightEnd == afterMidnightSrt)]
+
+# Use lubridate to add a day:
+oyster[afterMidnight, "end.datetime"] <- oyster[afterMidnight, "end.datetime"] + days(1)
+
+# Final transformations - add a journey time and a day of the week for each journey
+oyster <- oyster %>% 
+          mutate(journey.time = difftime(end.datetime, 
+                                         start.datetime, units = "mins"),
+                 journey.weekday = wday(date.clean, 
+                                        label = TRUE, 
+                                        abbr = FALSE))
+
+# Step 8 - answering more detailed questions -----------------------------------
+# Longest journey
+oyster %>% 
+  filter(journey.time == max(oyster$journey.time, na.rm = TRUE)) %>% 
+  select(journey.action, journey.time, date)
+
+
+# Average journey time by day
+oyster %>% 
+  group_by(journey.weekday) %>% 
+  summarise(avg_time = floor(mean(journey.time, na.rm = TRUE)))
+
+# Average journeys per day
+oyster %>% 
+  group_by(date.clean, journey.weekday) %>% 
+  summarise(journeys = n()) %>% 
+  group_by(journey.weekday) %>% 
+  summarise(avg_journeys = mean(journeys))
+
