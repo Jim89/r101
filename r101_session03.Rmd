@@ -41,21 +41,21 @@ oyster <- oyster %>%
           mutate(start.time.clean = paste0(start.time, ":00"),
                  end.time.clean = paste0(end.time, ":00"))
 
-oyster <- oyster %>% 
+oyster <- suppressWarnings(oyster %>% 
           separate(col = journey.action, 
                    into = c("from", "to"), 
                    sep = " to ", 
-                   remove = FALSE)
+                   remove = FALSE))
 
-oyster <- oyster %>% mutate(date.clean = dmy(date))
+oyster <- oyster %>% mutate(date.clean = suppressWarnings(dmy(date)))
 
 oyster <- oyster %>% 
     mutate(start.datetime = paste(date, start.time.clean, sep = " "),
            end.datetime = paste(date, end.time.clean, sep = " "))
 
 oyster <- oyster %>% 
-          mutate(start.datetime = dmy_hms(start.datetime),
-                 end.datetime = dmy_hms(end.datetime))
+          mutate(start.datetime = suppressWarnings(dmy_hms(start.datetime)),
+                 end.datetime = suppressWarnings(dmy_hms(end.datetime)))
 
 afterMidnightSrt <- grep("00|01|02", substring(oyster$start.time,1,2))
 afterMidnightEnd <- grep("00|01|02", substring(oyster$end.time,1,2))
@@ -400,31 +400,34 @@ To help us understand which stations we visit most, we'll create a new data set 
 
 ```{r visits}
 visited <- oyster %>%
-            select(from, from.long, from.lat) %>%
+            select(from.clean, from.long, from.lat) %>%
             setNames(c("station", "longitude", "latitude")) %>%
             rbind(oyster %>%
-                  select(to, to.long, to.lat) %>%
+                  select(to.clean, to.long, to.lat) %>%
                   setNames(c("station", "longitude", "latitude"))) %>%
             group_by(station, longitude, latitude) %>%
             summarise(visits = n()) %>%
-            filter(visits >= 10) %>% 
             ungroup() %>% 
             arrange(desc(visits))
 ```
 
-## Barcharts {.flexbox .vcenter}
-
-We can then create a bar chart using the "bar" `geom`. We also need to specify the `stat` argument to be "identity". This tells `qplot` to treat the data as-is, and not to transform it at all (otherwise it tried to do a histogram).
-
-```{r barplot, message = FALSE, fig.height=3.5, fig.width=8}
-qplot(x = station, y = visits, data = visited, geom = "bar", stat = "identity")
-```
-
 ## The limits of qplot
 
-We're getting to the limits of what `qplot` can achieve for now. Further tweaks will require us to use the `ggplot()` function itself. This is more complex and beyond the scope of this session, but if you're interested check out the excellent [documentation](http://docs.ggplot2.org/current/).
+We're getting to the limits of what `qplot` can achieve for now. `qplot` was [recently]() updated such that creating a bar chart is no longer an easy proposition, so we'll have to turn to `ggplot` for that.
 
-For now, we'll move on to some other interesting visualisations.
+Further tweaks will require us to use the `ggplot()` function itself. This is more complex and beyond the scope of this session, but if you're interested check out the excellent [documentation](http://docs.ggplot2.org/current/).
+
+We'll look at a quick example, but go no further than that.
+
+## Barcharts {.flexbox .vcenter}
+
+When we create a plot with `ggplot` we need to specificy some data and an aesthetic layer. We then use `+` to add layers that build up the plot.
+
+```{r barplot, message = FALSE, fig.height=3.5, fig.width=8, warning = FALSE}
+top_visits <- filter(visited, visits >= 10)
+ggplot(data = top_visits, aes(x = station, y = visits)) + geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = -90))
+```
 
 # leaflet
 
@@ -442,10 +445,10 @@ To help us out with our map, we'll use the data set that summarises how often ea
 
 ```{r visits2, eval = TRUE}
 visited <- oyster %>%
-            select(from, from.long, from.lat) %>%
+            select(from.clean, from.long, from.lat) %>%
             setNames(c("station", "longitude", "latitude")) %>%
             rbind(oyster %>%
-                  select(to, to.long, to.lat) %>%
+                  select(to.clean, to.long, to.lat) %>%
                   setNames(c("station", "longitude", "latitude"))) %>%
             group_by(station, longitude, latitude) %>%
             summarise(visits = n()) %>%
@@ -572,13 +575,3 @@ You can use any of the techniques we've covered in the sessions, and anything el
 Whilst there is a small prize, the main aim of this exercise is to give you some practice using R with some "real-life" messy data, and maybe something that you can then share with others afterwards. So don't stress too much about it, have fun, learn, and tell any story that you want to with the data. 
 
 # Q&A
-
-
-
-
-
-
-
-
-
-
