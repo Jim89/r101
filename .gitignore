@@ -3,7 +3,7 @@
 .RData
 
 # ignore html (presentation) files
-*.html
+# *.html
 
 # ignore all xlsx files
 *.xlsx
