@@ -40,7 +40,6 @@ Today we'll be going a bit deeper and looking at data manipulation and aggregati
 
 * __Oyster__: http://bit.ly/1nJ2jaS
 * __Stations__: http://bit.ly/1lw3CZO
-* __These slides__:
 
 ## A quick look at the data - again
 
@@ -136,7 +135,7 @@ whoops <- oyster %>% filter(balance < 0) # filtering with assignment
 noteworthy <- oyster %>% filter(note != "" & charge >= 2) # multiple conditions
 ```
 
-## dplyr - Filtering
+## dplyr - Filtering (code)
 
 Pretty much any logical test can be used with `filter`, including:
 
@@ -173,7 +172,7 @@ To do this we could manually break our data in to smaller sets and compute the s
 
 If anyone is familiar with pivot tables in Excel, group by is very similar.
 
-## dplyr - Aggregating by groups
+## dplyr - Aggregating by groups (code)
 
 `dplyr` has a `group_by` verb that we can add to the chain of commands. Note that we need to group before we summarise.
 
@@ -210,7 +209,7 @@ And specify multiple ordering fields:
 oyster %>% arrange(journey.action, desc(charge))
 ```
 
-## dplyr - Putting it all together
+## dplyr - Putting it all together 
 
 Now we've seen the individual functions, we can use the `%>%` operator to create a whole set of instructions to answer our questions, e.g.
 
@@ -266,7 +265,7 @@ records <- grep(badRecords, oyster$journey.action)
 
 `grep` is an R function that mimics functionality from the Unix command line, it searches for patterns called __regular expressions__. Don't worry too much about regular expressions for now, they're just a compact way of specifying patterns to search for. We'll see some other examples later.
 
-***
+## Slicing and dicing (code)
     
 Now that we have our index of bad records, we can use `slice` and `"-"` to get rid of the mess:
     
@@ -324,7 +323,7 @@ oyster <- oyster %>%
                  end.time.clean = paste0(end.time, ":00"))
 ```
 
-## tidyr - Splitting fields
+## tidyr - Splitting fields (code)
 
 We're getting closer to something that's useful, but we still could do with splitting _journey_ into separate "from" and "to" fields. Handily, we can use the `tidyr` package to do this, specifically, the `separate` function:
     
@@ -421,7 +420,7 @@ oyster[afterMidnight, "end.datetime"] <-
 
 Note that dplyr was _not_ used to do the manipulation for us. Sometimes base `R` is a little more compact, but perhaps less readable if we don't know exactly what's going on.
 
-## lubridate - date manipulation
+## lubridate - date manipulation (code)
 
 There are a few final things we might like to add to help us answer our questions:
     
