@@ -133,7 +133,7 @@ Such common columns are referred to as join _keys_ and are important to know abo
 
 Hadley Wickham has (yet again!) provided some excellent reference material to help you understand all the different types of join out there. You can check it out [here](http://r4ds.had.co.nz/relational-data.html).
 
-Today we'll be focussing on something called the "left join". Let's just draw a simple Venn diagram of what that means. 
+Today we'll be focusing on something called the "left join". Let's just draw a simple Venn diagram of what that means. 
 
 ## dplyr - joins
 
@@ -295,7 +295,7 @@ Whilst the syntax for more complicated plots can be tricky to understand at firs
 
 ## qplot
 
-Today we'll be focussing on the most simple function in the `ggplot2` package.
+Today we'll be focusing on the most simple function in the `ggplot2` package.
 
 Its name is `qplot()` ("quick-plot") and it combines most of the functionality of `ggplot2` in an easy-to-learn way. 
 
@@ -424,7 +424,7 @@ We'll look at a quick example, but go no further than that.
 
 ## Barcharts (code) {.flexbox .vcenter}
 
-When we create a plot with `ggplot` we need to specificy some data and an aesthetic layer. We then use `+` to add layers that build up the plot.
+When we create a plot with `ggplot` we need to specify some data and an aesthetic layer. We then use `+` to add layers that build up the plot.
 
 ```{r barplot, message = FALSE, fig.height=3.5, fig.width=8, warning = FALSE}
 top_visits <- filter(visited, visits >= 10)
