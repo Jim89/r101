@@ -41,8 +41,7 @@ In these sessions we'll discuss:
 
 * __Oyster data__: http://bit.ly/1nJ2jaS
 * __Stations data__: http://bit.ly/1lw3CZO
-* __These slides:__ [TO DO]
-
+  
 ## Isn't R just for stats?
 
 Simply put: no.
@@ -128,6 +127,8 @@ Scripts are recommended as they:
 1. Record your steps clearly; and
 2. Ensure you can replicate and modify your work easily.
 
+## Advanced useR - scripting
+
 To run any commands from the scripting window, highlight them and use Ctrl+Enter or click "Run" in the top right of the scripting area. This is the equivalent of typing them in to the console.
 
 Comments can be added using the `#` symbol in line. Anything after the `#` will be ignored by R when you run your code.
@@ -171,7 +172,7 @@ library(stringr)
 ```
 
 
-## Installing packages
+## Installing packages (code)
 
 Packages are generally hosted on, and installed from CRAN (the R network). Installing packages is easy using this code:
 
@@ -185,7 +186,7 @@ So to install the `dplyr` package we would use the code:
 install.packages("dplyr")
 ```
 
-Most of these packages were created by a prolific package author called Hadley Wickham. There are many alternatives to the "Hadley" way of doing things, but for beginners his methods are often easiest to get to grips with.
+Most of the packages we'll use were created by a prolific package author called Hadley Wickham. There are many alternatives to the "Hadley" way of doing things, but for beginners his methods are often easiest to get to grips with.
 
 # A quick aside | Getting help
 
@@ -194,7 +195,7 @@ Most of these packages were created by a prolific package author called Hadley W
 The great thing about an open source language is its community. Luckily, 
 R is no exception and there are a wealth of options for getting help:
 
-1. R help files: `?mean`, `?iris`
+1. R help files: `?mean`, `?install.packages`
 2. R package vignettes - can see those available with `vignette()`
 3. [Google!](https://www.google.co.uk/#safe=off&q=r+help) - but seriously this solves 
  >99% of problems
@@ -243,30 +244,30 @@ a <- 10
 data  <- SomeDataFromSomewhere
 ```
 
-## Data structure examples
+## Data structure examples (code)
 
-1. Vectors
+* Vectors
 
 ```{r create_vector}
 x <- c(1, 2, 3, 4, 5, 6)
 ```
 
-2. Lists
+* Lists
 
 ```{r create_list}
 y <- list(1, 2, "jim", 4, "leach")
 z <- list(x, y)
 ```
 
-## Data structure examples
+## Data structure examples (code)
 
-3. Data frames
+* Data frames
 ```{r create_df}
 df <- data.frame(x = c(1, 2, 3), # column one
                  y = c("a", "b", "c")) # column 2
 ```
 
-4. Matrices
+* Matrices
 ```{r create_matrix}
 mat <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, byrow = TRUE)
 mat2 <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2,  byrow = FALSE)
@@ -353,7 +354,7 @@ Your code will behave differently depending on the data type.
 
 # Moving Fu-R-ther | Checking and exploring data
 
-## Looking at your data
+## Looking at your data 
 
 ```{r get_oyster, echo = TRUE}
 oyster <- read_csv("./data/oyster_all_raw_20160125.csv")
@@ -384,7 +385,7 @@ It sounds silly, but capitalisation in column names will slow you down. Luckily,
 names(oyster) <- tolower(names(oyster))
 ```
 
-## Sizing your data
+## Sizing your data (code)
 
 It can often be useful to understand the _dimensions_ of the data you're working with.
 
@@ -472,7 +473,7 @@ By this we mean that it doesn't save that result anywhere. You could write it do
 subset <- oyster[1:10, ]
 ```
 
-## Fixing problems - changing data types
+## Fixing problems - changing data types (code)
 
 If we want to change the data type of a specific field, we can use a variety of `as.[data_type]` functions to force (_"coerce"_) data to the type we want it. 
 
@@ -531,7 +532,7 @@ table(data$field)  # Gives a frequency table
 
 Most common descriptive statistics have their own similar function(s), it's just a matter of experimenting or Google-ing to find the one you're looking for.
 
-## Final note - missing values
+## Final note - missing values (code)
 
 All languages handle missing values differently. In `R`, missing values are generally represented as `NA`. 
 
