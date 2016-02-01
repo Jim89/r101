@@ -119,6 +119,8 @@ qplot(x = as.numeric(journey.time), data = oyster, main = "Histogram of journey 
       xlab = "Journey time (mins)", ylab = "Count", fill = I("steelblue"), 
       colour = I("white"))
 
+# ----------
+
 # Filter out free journeys
 oyster_charged <- oyster %>% filter(charge != 0)
 
@@ -134,6 +136,8 @@ qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
 qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
       xlab = "Journey time(mins)", ylab = "Charge (£)", geom = c("point"),
       shape = journey.weekday, colour = journey.weekday)
+
+# ----------
 
 # Make a boxplot
 qplot(x = journey.weekday, y = as.numeric(journey.time), 
