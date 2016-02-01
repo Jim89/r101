@@ -37,7 +37,7 @@ colnames(oyster) <- tolower(colnames(oyster))
 
 # Step 2 - selection examples --------------------------------------------------
 # Select columns with names
-oyster %>% select(Date, journey.action, charge)
+oyster %>% select(date, journey.action, charge)
 
 # Select columns with positions (e.g. column 1, 2, and 3; 5 and 7)
 oyster %>% select(1:3, 5, 7)
