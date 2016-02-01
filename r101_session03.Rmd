@@ -80,7 +80,6 @@ In the last session we covered data cleansing, manipulation and aggregation. Tod
 
 * __Oyster__: http://bit.ly/1nJ2jaS
 * __Stations__: http://bit.ly/1lw3CZO
-* __These slides__:
 
 ## A quick look at the data - again
 
@@ -180,7 +179,7 @@ stations %>%
 
 The join keys are not quite the same, so we'll need to do one last bit of cleaning.
 
-## A return to regular expressions
+## A return to regular expressions (code)
 
 There are other patterns in other station names that we might want to remove, e.g. "[London Underground]", "[Dlr]", or "(National Rail)".
 
@@ -233,7 +232,7 @@ oyster <- oyster %>%
 
 The `rename` function is also from `dplyr` and renames columns using a `new_name = old_name` syntax.
 
-## Answering the last question
+## Answering the last question (code)
 
 We now should have everything we need to answer the last question.
 
@@ -290,6 +289,10 @@ It follows and implements the principles set out in the book "A Grammar of Graph
 
 Whilst the syntax for more complicated plots can be tricky to understand at first, once you master it it becomes a fabulous tool for creating beautiful and elegant plots.
 
+## ggplot {.flexbox .vcenter}
+
+<img src="./resources/images/HadleyObama.png" height="500" width="450">
+
 ## qplot
 
 Today we'll be focussing on the most simple function in the `ggplot2` package.
@@ -319,7 +322,7 @@ qplot(x = as.numeric(journey.time), data = oyster, main = "Histogram of journey 
       xlab = "Journey time (mins)", ylab = "Count")
 ```
 
-## A simple histogram {.flexbox .vcenter}
+## A simple histogram (code) {.flexbox .vcenter}
 
 Lets add some colour to make it look a little prettier. We do this with the `fill` argument when we're _filling_ in an area and `colour` to colour in lines or points.
 
@@ -367,7 +370,7 @@ qplot(x = as.numeric(journey.time), y = charge, data = oyster_charged,
       xlab = "Journey time(mins)", ylab = "Charge (£)", geom = c("point", "smooth"))
 ```
 
-## A scatter plot {.flexbox .vcenter}
+## A scatter plot (code) {.flexbox .vcenter}
 
 We might also want to colour and/or shape the points depending on which day of the week the journey was on. Easily done with the `shape` and `colour` arguments (we'll remove the smoother for now).
 
@@ -419,7 +422,7 @@ Further tweaks will require us to use the `ggplot()` function itself. This is mo
 
 We'll look at a quick example, but go no further than that.
 
-## Barcharts {.flexbox .vcenter}
+## Barcharts (code) {.flexbox .vcenter}
 
 When we create a plot with `ggplot` we need to specificy some data and an aesthetic layer. We then use `+` to add layers that build up the plot.
 
@@ -455,7 +458,7 @@ visited <- oyster %>%
             filter(!is.na((longitude)))
 ```
 
-## Creating the map
+## Creating the map (code)
 
 ```{r makeLeaflet, message = FALSE, eval = FALSE}
 library(leaflet)
@@ -489,7 +492,7 @@ Journeys are made from nodes in the network to other nodes in the network (i.e. 
 
 Whilst the data for just _one_ traveler on the underground are not particularly interesting, if we had access to _everyone's_ data, then we would have a really interesting network data set to investigate. Let's make a simple network plot.
 
-## Creating the network diagram
+## Creating the network diagram (code)
 
 ```{r makenetwork, message = FALSE, eval = FALSE}
 library(networkD3)
@@ -541,7 +544,7 @@ In these last few sessions we've gone through a lot. We've covered:
 
 As we said at the beginning, there are lots of great sources of help for R problems. The top 3 are probably:
     
-1. R help files: `?mean`, `?iris`
+1. R help files: `?mean`, `?grep`
 2. R package vignettes - can see those available with `vignette()`
 3. [Google!](https://www.google.co.uk/#safe=off&q=r+help)
                  
@@ -568,10 +571,16 @@ There are loads of great sources of R information out there. Here are just a few
 
 ## Prize 
 
-To keep you going and learning with R, ICDSS are kindly sponsoring a small prize based on these workshops. What they're looking for is an exploratory data analysis that tells a story about the Oyster data.
+To keep you going and learning with R, ICDSS are kindly sponsoring a small prize based on these workshops. What they're looking for is an exploratory and descriptive data analysis that tells a story about the Oyster data.
 
-You can use any of the techniques we've covered in the sessions, and anything else that you find online that you want as well. Responses can be in any format (we'd suggest investigating the `RMarkdown` reporting structure that RStudio have released) and focus on any aspect of the data that you'd like. Feel free to use the Shiny app we reviewed earlier as inspiration.
+You can use any of the techniques we've covered in the sessions or anything else that you find online.
 
-Whilst there is a small prize, the main aim of this exercise is to give you some practice using R with some "real-life" messy data, and maybe something that you can then share with others afterwards. So don't stress too much about it, have fun, learn, and tell any story that you want to with the data. 
+Responses can be in any format (we'd suggest investigating the `RMarkdown` reporting structure that RStudio have released) and focus on any aspect of the data that you'd like. 
+
+## Prize 
+
+Remember, the __main aim__ of this exercise is to __learn and have fun__ using R with some "real-life" messy data. So don't stress too much about it, discuss it with others (or with me!), and tell any story that you want to with the data. 
+
+__Submissions will be accepted up to 17th March.__
 
 # Q&A
