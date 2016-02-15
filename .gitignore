@@ -4,6 +4,6 @@
 
 # ignore html (presentation) files
 # *.html
-
+presentation.html
 # ignore all xlsx files
 *.xlsx
