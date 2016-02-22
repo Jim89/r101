@@ -78,8 +78,8 @@ In the last session we covered data cleansing, manipulation and aggregation. Tod
 
 ### Today's data:
 
-* __Oyster__: http://bit.ly/1nJ2jaS
-* __Stations__: http://bit.ly/1lw3CZO
+* __Oyster__: https://db.tt/81Xpi0LD
+* __Stations__: https://db.tt/81Xpi0LD
 
 ## A quick look at the data - again
 
@@ -106,7 +106,7 @@ read.csv("./data/stations.csv") %>%
 
 Now we've seen the data, we can start to come up with some exploratory questions we might ask:
 
-* <del>What are the top 5 journeys?<\del>
+* <del>What are the top 5 journeys?</del>
 * <del>What was the longest journey, how long was it, and when was it?</del>
 * <del>What is the average journey time for each day of the week?</del>
 * <del>What is the average number of journeys per day of the week?</del>
@@ -432,6 +432,37 @@ ggplot(data = top_visits, aes(x = station, y = visits)) + geom_bar(stat = "ident
   theme(axis.text.x = element_text(angle = -90))
 ```
 
+## An example {.flexbox .vcenter}
+
+Let's have a look at an example plot we could make of journey times.
+
+```{r hist, echo = FALSE, message = FALSE, warning=FALSE}
+DarkBlue <- rgb(red = 0, green = 51, blue = 141, maxColorValue = 255)
+oyster %>% 
+  mutate(weekend = ifelse(journey.weekday == "Saturday" | journey.weekday == "Sunday", 
+                          "Weekend", "Weekday")) %>%       
+  ggplot(aes(x = journey.time %>% as.numeric)) + 
+  geom_histogram(fill = DarkBlue, colour = "white", binwidth = 5, alpha = 0.8) +
+  facet_grid(weekend ~ ., scales = "fixed") +
+  scale_x_continuous(breaks = seq(from = 0, 
+                                  to = oyster$journey.time %>% as.numeric() %>%
+                                                  max(na.rm = T) + 5, by = 5)) +
+  xlab("Journey time / minutes") +
+  ggtitle("Journey time histograms by weekend/weekday")+
+  theme(axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        #axis.text.y = element_blank(),
+        text = element_text(size = 14),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        #         element_line(colour = "lightgrey",
+        #                                         linetype = "dotted"),
+        panel.grid.major.y = element_line(colour = "lightgrey", linetype = "dotted"),
+        panel.grid.minor.y = element_blank(),
+        panel.margin.y = unit(0.1, units = "in"),
+        panel.background = element_rect(fill = "white", colour = "lightgrey"))
+```
+
 # leaflet
 
 ## An introduction to leaflet
@@ -581,6 +612,11 @@ Responses can be in any format (we'd suggest investigating the `RMarkdown` repor
 
 Remember, the __main aim__ of this exercise is to __learn and have fun__ using R with some "real-life" messy data. So don't stress too much about it, discuss it with others (or with me!), and tell any story that you want to with the data. 
 
-__Submissions will be accepted up to 17th March.__
+__Submissions will be accepted up to 25th March.__
+
+The prize is £50 to be used for attendance to the [Coursera](https://www.coursera.org/specializations/jhu-data-science) courses:
+
+* Data Scientists Toolbox; and
+* R-Programming
 
 # Q&A
