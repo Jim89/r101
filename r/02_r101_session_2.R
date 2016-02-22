@@ -29,7 +29,7 @@ library(stringr)
 
 # SET THE FILE PATH TO WHERE YOU HAVE SAVED THE DATA, E.G.
 # C:/USERS/JIM/DESKTOP/oyster_all_raw_20160125.csv
-oyster_data_path <- "PATH/TO/DATA/LOCATION/OF/oyster_all_raw_20160125.csv"
+oyster_data_path <- "./data/oyster_all_raw_20160125.csv"
 
 # finding and setting your working directory --------------------------
 getwd()
