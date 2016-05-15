@@ -29,7 +29,11 @@ library(stringr)
 
 # SET THE FILE PATH TO WHERE YOU HAVE SAVED THE DATA, E.G.
 # C:/USERS/JIM/DESKTOP/oyster_all_raw_20160125.csv
-oyster_data_path <- "PATH/TO/DATA/LOCATION/OF/oyster_all_raw_20160125.csv"
+oyster_data_path <- "./data/oyster_all_raw_20160125.csv"
+
+# finding and setting your working directory --------------------------
+getwd()
+setwd("/path/to/directory")
 
 # Step 1 - read in the data ----------------------------------------------------
 oyster <- read_csv(oyster_data_path)
@@ -133,7 +137,7 @@ oyster <- oyster %>%
           mutate(start.datetime = dmy_hms(start.datetime),
                  end.datetime = dmy_hms(end.datetime))
 
-# Date manipulation - identify dates with journeys around midnight ------
+# Step 8 - Date manipulation --------------- -----------------------------------
 # Find all the times a journey started after midnight
 afterMidnightSrt <- grep("00|01|02", substring(oyster$start.time,1,2))
 
@@ -154,7 +158,7 @@ oyster <- oyster %>%
                                         label = TRUE, 
                                         abbr = FALSE))
 
-# Step 8 - answering more detailed questions -----------------------------------
+# Step 9 - answering more detailed questions -----------------------------------
 # Longest journey
 oyster %>% 
   filter(journey.time == max(oyster$journey.time, na.rm = TRUE)) %>% 

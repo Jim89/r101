@@ -161,6 +161,35 @@ ggplot(data = visited, aes(x = station, y = visits)) +
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = -90))
 
+
+# Create a colour to use in the plot
+DarkBlue <- rgb(red = 0, green = 51, blue = 141, maxColorValue = 255)
+
+# Example faceted-histogram using ggplot:
+oyster %>% 
+  mutate(weekend = ifelse(journey.weekday == "Saturday" | journey.weekday == "Sunday", 
+                          "Weekend", "Weekday")) %>%       
+  ggplot(aes(x = journey.time %>% as.numeric)) + 
+  geom_histogram(fill = DarkBlue, colour = "white", binwidth = 5, alpha = 0.8) +
+  facet_grid(weekend ~ ., scales = "fixed") +
+  scale_x_continuous(breaks = seq(from = 0, 
+                                  to = oyster$journey.time %>% as.numeric() %>%
+                                                  max(na.rm = T) + 5, by = 5)) +
+  xlab("Journey time / minutes") +
+  theme(axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        #axis.text.y = element_blank(),
+        text = element_text(size = 14),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        #         element_line(colour = "lightgrey",
+        #                                         linetype = "dotted"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.margin.y = unit(0.1, units = "in"),
+        panel.background = element_rect(fill = "white", colour = "lightgrey"))
+  
+
 # Step 6 - using leaflet -------------------------------------------------------
 # Create another summary, but this time exclude points without coordinates
 visited <- oyster %>%

@@ -38,8 +38,8 @@ Today we'll be going a bit deeper and looking at data manipulation and aggregati
 
 ### Today's data:
 
-* __Oyster__: http://bit.ly/1nJ2jaS
-* __Stations__: http://bit.ly/1lw3CZO
+* __Oyster__: https://db.tt/81Xpi0LD
+* __Stations__: https://db.tt/81Xpi0LD
 
 ## A quick look at the data - again
 
@@ -70,6 +70,66 @@ Now we've seen the data, we can start to come up with some exploratory questions
 * What is the average number of journeys per day of the week?
 * Where does Jim live, and what are the coordinates of the station?
 
+# A reminder | and three notes
+
+## A reminder - packages
+
+Packages are great extentions to the `R` language. Packages can be installed using:
+
+```{r eval = FALSE}
+install.packages("[package name here]")
+```
+
+When you need to _use_ a package, you can load it using:
+
+```{r eval = FALSE}
+library([package name here])
+```
+
+The script file should ensure you have all the packages we need installed and loaded, but if you're unsure please double check.
+
+## A note - your working directory
+
+Your _working directory_ is the location on your computer that `R` is "pointing at".
+
+You can find your current working directory using:
+
+```{r eval = FALSE}
+getwd()
+```
+
+You can then _set_ your working directory to somewhere else using:
+
+```{r eval = FALSE}
+setwd("PATH/TO/WHERE/YOU/WANT/TO/SET/YOUR/DIRECTORY")
+```
+
+## Another note - saving your progress
+
+Another way to save your progress is to save your entire workspace to a file. 
+
+This is done using:
+
+```{r eval = FALSE}
+save.image(file = "name_of_file.RData")
+```
+
+You can then re-load your workspace at any time using:
+
+```{r eval = FALSE}
+load(file = "name_of_file.Rdata")
+```
+
+This is not necessarily recommended, as it can allow errors to propogate. Scripts are a better way to save your progress.
+
+## The last note - Projects
+
+RStudio projects are a great way to organise your work. 
+
+They can be created easily by clicking the drop down in the top right of your RStudio window and selecting "New project". 
+
+When you shut a project, anything you were working on will get re-opened the next time you open the project, and your working directory will automatically get set to wherever the project is saved.
+
 # Digging Deepe-R | Manipulating and aggregating data
 
 ## Pro-tip - piping your operations
@@ -85,7 +145,24 @@ can be read as "take some_data, __then__ perform some function on it".
 
 ## Pro-tip - piping your operations
 
-To get specific, the left hand side of `%>%` is *piped* into the first argument of the function on the right hand side. There are a few restrictions on exactly what you can *pipe* in to what, but for our purposes this is a good rule of thumb. You can insert them in to your code with shortcut `CTRL+SHIFT+M` (Windows) or `CMD+SHFT+M` (Mac).
+To get specific, the left hand side of `%>%` is *piped* into the first argument of the function on the right hand side. 
+
+There are a few restrictions on exactly what you can *pipe* in to what, but for our purposes this is a good rule of thumb. 
+
+You can insert them in to your code with shortcut `CTRL+SHIFT+M` (Windows) or `CMD+SHFT+M` (Mac).
+
+## Pipes in action
+
+Here's a quick example of how a data _pipeline_ can work:
+
+```{r eval = FALSE}
+ read_csv('/path/to/data/file.csv') %>%
+  subset(variable_a > x) %>%
+  transform(variable_c = variable_a/variable_b) %>%
+  head(100)
+```
+
+Note that this is _psuedo-code_: it's just an example!
 
 ## dplyr - A very brief introduction
 
@@ -159,7 +236,7 @@ Note that multiple summaries using multiple functions within `summarise`, they j
 
 ```{r dplyrSummarise2, eval = FALSE}
 oyster %>% summarise(avg_charge = mean(charge, na.rm = TRUE), # average charge
-sd_charge = sd(charge, na.rm = TRUE)) # charge std. deviation
+                      sd_charge = sd(charge, na.rm = TRUE)) # charge std. deviation
 ```
 
 Most functions can be applied within summarise (including bespoke ones!). However, we're probably more interested in grouping our data first.
@@ -258,12 +335,18 @@ This sort of thing is no good, so we'll remove it.
 To start with, though, we need the rows that contain the messy data:
 ```{r getMess, eval = TRUE}
 badRecords <- "Topped-up|Season ticket|Unspecified location"
+```
 
+## Finding the mess
+
+```{r findMess}
 # grep([what to search], [where to search for it])
 records <- grep(badRecords, oyster$journey.action) 
 ```
 
-`grep` is an R function that mimics functionality from the Unix command line, it searches for patterns called __regular expressions__. Don't worry too much about regular expressions for now, they're just a compact way of specifying patterns to search for. We'll see some other examples later.
+`grep` is an R function that mimics functionality from the Unix command line, it searches for patterns called __regular expressions__. 
+
+Don't worry too much about regular expressions for now, they're just a compact way of specifying patterns to search for. We'll see some other examples later.
 
 ## Slicing and dicing (code)
     
@@ -274,7 +357,9 @@ Now that we have our index of bad records, we can use `slice` and `"-"` to get r
 oyster <- oyster %>% slice(-records)
 ```
 
-Note the use of `-` to do "negative selection" to omit records from the data. This is similar to using `oyster[-records, ]` but fits in to a `dplyr` pipeline.
+Note the use of `-` to do "negative selection" to omit records from the data. 
+
+This is similar to using `oyster[-records, ]` but fits in to a `dplyr` pipeline.
 
 However, there's still a lot of mess - poorly formatted dates and useless journey strings.
 
@@ -309,7 +394,7 @@ Looks OK, but not quite what we want. Ideally we'd like `HH:MM:SS` formats.
 
 ## dplyr - Adding variables
 
-We can use the 'paste' command to get what we need.
+We can use the 'paste' command to get what we need (similar to `CONCATENATE` in Excel).
 
 ```{r paste_eg, eval = FALSE}
 paste(string1, string2, string3, ..., sep = " ") # paste strings together with a space
@@ -328,8 +413,6 @@ oyster <- oyster %>%
 We're getting closer to something that's useful, but we still could do with splitting _journey_ into separate "from" and "to" fields. Handily, we can use the `tidyr` package to do this, specifically, the `separate` function:
     
 ```{r separate_eg, eval = FALSE}
-install.packages("tidyr")
-library(tidyr)
 separate([data], [column to separate], [new columns], sep = [separator], remove = FALSE)
 ```
 
@@ -374,7 +457,7 @@ oyster <- oyster %>% mutate(date.clean = dmy(date))
     
 It's simple: __YYYY-MM-DD__
 
-## dplyr - adding date _times_
+## dplyr - adding date _times_ (code)
 
 Dates and times are all well and good, but a _datetime_ variable might be more useful.
 
@@ -412,13 +495,19 @@ afterMidnightEnd <- grep("00|01|02", substring(oyster$end.time,1,2))
 afterMidnight <- afterMidnightEnd[!(afterMidnightEnd == afterMidnightSrt)] 
 ```
 
-And then use `lubridate` to add a day:
+The `substring` function extracts characters from text data. We tell it where to start extracting from, and how many characters to extract.
+
+## lubridate - date manipulation
+
+We then use `lubridate` to add a day:
+
 ```{r add_day}
-oyster[afterMidnight, "end.datetime"] <- 
-    oyster[afterMidnight, "end.datetime"] + days(1)
+oyster[afterMidnight, "end.datetime"] <- oyster[afterMidnight, "end.datetime"] + days(1)
 ```
 
-Note that dplyr was _not_ used to do the manipulation for us. Sometimes base `R` is a little more compact, but perhaps less readable if we don't know exactly what's going on.
+Note that dplyr was _not_ used to do the manipulation for us. 
+
+Sometimes base `R` is a little more compact, but perhaps less readable if we don't know exactly what's going on.
 
 ## lubridate - date manipulation (code)
 
