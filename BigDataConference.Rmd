@@ -1,0 +1,602 @@
+---
+title: "R 101"
+subtitle: "Session 1: An introduction to R"
+author: "" 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow   # 
+output: 
+    ioslides_presentation:
+        logo: "./resources/images/icdss.jpg"
+        css: "./resources/css/styles.css"
+mode: selfcontained
+widescreen: true
+---
+# Introduction
+
+## Background
+
+R is a widely used, open source language for data analysis. It can be easily incorporated into most data-oriented or analytical projects. 
+
+It can handle pretty much any sort of analysis; the tough thing is often getting your data in to the right shape to do so. 
+
+In these sessions we'll discuss:
+
+* An overview of R and some important terms and concepts;
+* Simple data manipulation and aggregation;
+* Joining data together; and
+* Visualising your data to tell a story
+
+## A bit about me
+
+* __Name__: Jim Leach;
+* __Course__: MSc. Business Analytics;
+* __Occupation__: Data science consultant at KPMG;
+* __Contact details__:
+    * [leach_jim (twitter)](http://twitter.com/leach_jim)
+    * [jim@thedatagent.com](mailto:jim@thedatagent.com)
+* __Years using R__: 3.
+
+### Resources:
+
+* __Oyster data__: http://bit.ly/1nJ2jaS
+* __Stations data__: http://bit.ly/1lw3CZO
+  
+## Isn't R just for stats?
+
+Simply put: no.
+
+Whilst R does have powerful statistical capabilities (in fact, more than other [languages](http://stanfordphd.com/Statistical_Software.html)) it's also [ranked highly](https://www.oreilly.com/ideas/2015-data-science-salary-survey) (behind only SQL and Excel) as a general analytics tool. 
+
+It's also the 6^th^ most popular [programming language](http://spectrum.ieee.org/computing/software/the-2015-top-ten-programming-languages) in the world. Not bad.
+
+## Why R?
+
+* Free
+
+<br>
+
+* Flexible
+
+<br>
+
+* Powerful
+
+<br>
+
+* Future-resistant
+
+## Why not R?
+
+* Open source is scary, right?
+
+<br>
+
+* There's no support!
+
+<br>
+
+* R can't handle "big" data!
+
+<br>
+
+* But seriously, how ways many are there to do this?!
+
+
+## Agenda
+
+Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment. It's the best way to use R, so we'll provide a brief overview of it before diving in to:
+
+* Reading data in to R;
+* Quick looks at your data; and
+* Simple data summaries.
+
+In future sessions we'll cover
+
+* Data cleaning;
+* Joining data together; and
+* Creating visualisations
+
+## Checkpoint
+
+To help me get an understanding of your level who has:
+
+1. Programmed in R before?
+2. Programmed in _any_ language before?
+3. Seen R code before?
+4. Used Excel for data analysis?
+
+## R Studio | A whistlestop tour
+<div class="columns-2">
+   <img src="./resources/images/rstudio.png" height="300" width="520">
+
+   * Console
+   * Scripting/Source
+   * Environment
+   * Files, plots, help, packages
+</div>
+
+## Advanced useR - scripting
+
+The scripting environment in R functions just like a code window in any other language.
+
+To create a new script, use Ctrl+Shift+N, click the "new script" icon in the top left corner of R Studio or use File > New File > R Script.
+
+Scripts are recommended as they:
+
+1. Record your steps clearly; and
+2. Ensure you can replicate and modify your work easily.
+
+## Advanced useR - scripting
+
+To run any commands from the scripting window, highlight them and use Ctrl+Enter or click "Run" in the top right of the scripting area. This is the equivalent of typing them in to the console.
+
+Comments can be added using the `#` symbol in line. Anything after the `#` will be ignored by R when you run your code.
+
+## The bits that aren't for typing
+
+* __Environment__ - shows all objects (i.e. data) currently loaded in 
+to R.
+* __History__ - a list of recently executed R commands.
+* __Files__ - operates as a file browser, helping you navigate around your file system.
+* __Plots__ - displays any plots you've made from an R script or from the console.
+* __Packages__ - lists all the packages you've got installed/loaded. 
+* __Help__ - Displays information on all R functions, the options for each one and examples of their usage.
+
+## Packages
+
+R packages are additions to the base R language. They add extra functionality that makes R one of the most flexible languages for data analysis out there - if there's something specific you'd like to do in R, the chances are there's a package for it. 
+
+In these sessions we'll be discussing and using a number of packages that will help us get started with R.
+
+## Packages
+
+* [readr](https://github.com/hadley/readr) - reading and writing data
+* [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) - data manipulation
+* [magrittr](http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) - data pipelines
+* [readxl](http://blog.rstudio.org/2015/04/15/readxl-0-1-0/) - reading data from Excel
+* [tidyr](http://blog.rstudio.org/2014/07/22/introducing-tidyr/) - tidying data
+* [lubridate](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/) - working with dates and times;
+* [ggplot2](http://ggplot2.org/) - creating static charts;
+* [leaflet](https://rstudio.github.io/leaflet/) - creating interactive maps; and
+* [networkD3](https://christophergandrud.github.io/networkD3/) - creating network diagrams
+
+```{r load_packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(magrittr)
+library(readxl)
+library(tidyr)
+library(lubridate)
+library(stringr)
+```
+
+
+## Installing packages (code)
+
+Packages are generally hosted on, and installed from CRAN (the R network). Installing packages is easy using this code:
+
+```
+install.package("[package name here]")
+```
+
+So to install the `dplyr` package we would use the code:
+
+```{r eval = FALSE}
+install.packages("dplyr")
+```
+
+Most of the packages we'll use were created by a prolific package author called Hadley Wickham. There are many alternatives to the "Hadley" way of doing things, but for beginners his methods are often easiest to get to grips with.
+
+# A quick aside | Getting help
+
+## *Where* to ask for help
+
+The great thing about an open source language is its community. Luckily, 
+R is no exception and there are a wealth of options for getting help:
+
+1. R help files: `?mean`, `?install.packages`
+2. R package vignettes - can see those available with `vignette()`
+3. [Google!](https://www.google.co.uk/#safe=off&q=r+help) - but seriously this solves 
+ >99% of problems
+4. [StackOverflow](http://stackoverflow.com/questions/tagged/r)
+5. [Jim Leach](mailto:jim@thedatagent.com)
+6. [R mailing list](http://www.r-project.org/mail.html)
+
+## *How* to ask for help
+
+If you really have a problem that you can't solve with Google you may 
+want to post to Stack Overflow, the R mailing list or similar. If you 
+do, remember to:
+
+1. Be explicit - state your problem in detail.
+2. Describe the goal of your analysis - not the programming steps you're taking.
+3. Provide reproducible examples - simulate the data if needs be.
+4. Provide your hardware/software set up.
+
+# Getting Sta-R-ted | Loading data
+
+## Data structures
+
+There are a range of different objects in R that hold some form of data. The most common are:
+
+* __Vectors__ - a sequence of values that have the same data type (e.g. all numbers or all letters). 
+* __Lists__ - similar to vectors but can have different data types (e.g. a mix of numbers of characters).
+
+Think of these two as a bit like a single column in Excel.
+
+* __Matrices__ - a table of values where all fields have the same data type.
+* __Data frames__ - a table of values with different data types in each field.
+
+These latter two can be though of as Excel datasets.
+
+## Quick tip - assignment in R
+
+In R you should use the `<-` symbol to assign a value or some data to an R object:
+
+```{r assingmenteg1, eval=FALSE}
+a <- 10
+```
+
+(Pretty much) anything can be assigned to   an R object - including an entire data set.
+
+```{r assingmenteg2, eval=FALSE}
+data  <- SomeDataFromSomewhere
+```
+
+## Data structure examples (code)
+
+* Vectors
+
+```{r create_vector}
+x <- c(1, 2, 3, 4, 5, 6)
+```
+
+* Lists
+
+```{r create_list}
+y <- list(1, 2, "jim", 4, "leach")
+z <- list(x, y)
+```
+
+## Data structure examples (code)
+
+* Data frames
+```{r create_df}
+df <- data.frame(x = c(1, 2, 3), # column one
+                 y = c("a", "b", "c")) # column 2
+```
+
+* Matrices
+```{r create_matrix}
+mat <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, byrow = TRUE)
+mat2 <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2,  byrow = FALSE)
+```
+
+## What is a .csv
+
+A _.csv_ file is a "comma-separated-values" file. 
+
+It's a way to store data in a text file in a structured way that most spreadsheet/database/analysis programs understand.
+
+It looks a bit like this in its raw form:
+
+```
+Date,Start.Time,End.Time,Journey.Action,Charge,Credit,Balance,Note
+13-Feb-2015,21:43,22:12,South Kensington to Richmond,0,NA,5.1,NA
+13-Feb-2015,18:18,18:47,Canary Wharf [London Underground] to South Kensington,0,NA,5.1,NA
+```
+
+## Reading from .csv
+
+Loading data from CSV is usually the quickest and easiest method to get data in to R. The `read_csv` function from the `readr` package makes this really easy.
+
+```{r readCSV, eval=FALSE}
+data <- read_csv("[some data].csv", col_names = TRUE, skip = 0, col_types = NULL)
+```
+
+Generally, `read_csv` only needs you to specify the file path, the other options (e.g. header row true/false) are taken care of for you.
+
+Try reading the `oyster_all_raw_20160125.csv` data file in to R.
+
+## Reading from Excel
+
+Excel is notorious for making importing data a nightmare. It's no different with R. Ideally you should save your Excel file(s) as .csv files before importing in to R. 
+
+However if you *have* to import from Excel, then using the `readxl` package is recommended:
+
+```{r readExcel, eval=FALSE}
+library(readxl)
+data <- read_excel("path/to/excel/file", sheet = "[the sheet you want]", col_names = T)
+```
+
+If we look at the help file with `?read_excel` we see that there are lots of options we can set, including reading in a specific named sheet, setting a start row and specifying the type data in each column.
+
+## Reading from anywhere
+
+One of the benefits of R is that is can read pretty much any data source you name using a variety of packages:
+
+* Other software (e.g. Stata/SPSS/SAS) - `foreign`
+* SQL databases - `RPostgreSQL`, `RODBC`, `RMySQL`, `RSQLite`
+* Web API or raw webpages - `xml2`, `rjson`, `jsonlite`, `rvest` 
+* Hadoop ecosystem data - `rmr`, `rhdfs`, `SparkR`
+* pdf and Word documents - `tm`
+
+If you ever need to read data in one of these formats and you don't know how, the best way to find the answer is to Google:
+
+"R package read [data source here] data"
+
+## Writing data with R
+
+It's easy to write out to csv with `readr`, too:
+
+```{r writeFlat, eval=FALSE}
+write_csv(data, file = "./outputs/file.csv")
+```
+
+Writing to Excel requires the `xlsx` package:
+```{r write_excl, eval=FALSE}
+library(xlsx)
+write.xlsx(data, file = "/path/to/file.xlsx")
+```
+
+## Data types in R
+
+R stores data as one of the following types (similar to column types in Excel):
+
+* _Numeric_ - numbers with decimal points
+* _Integer_ - whole numbers
+* _Logical_ - Boolean True/False
+* _Factors_ - categorical data, with each category stored as a numerical level "under the bonnet". Factors can be ordered ("Ordinal") or un-ordered ("Nominal").
+* _Character_ - strings
+
+Your code will behave differently depending on the data type.
+
+# Moving Fu-R-ther | Checking and exploring data
+
+## Looking at your data 
+
+```{r get_oyster, echo = TRUE}
+oyster <- read_csv("./data/oyster_all_raw_20160125.csv")
+```
+
+The first thing most of us want to do with our data is to look at it. In R Studio we can accomplish this in a few ways.
+
+1. Click on the data frame in your Environment window - this will open up the data viewer.
+2. Using the `View()` command from the script or the command line - this will also open the viewer
+3. Use the `head([data], [rows])` command - this will print the first few lines of the data to the console.
+
+Try this now.
+
+## A quick look at the data
+
+The Oyster data look something like this:
+
+```{r show_oyster, echo = FALSE}
+library(knitr)
+oyster %>% head(4) %>% kable()
+```
+
+## Because no one likes typos - make it easier to type
+
+It sounds silly, but capitalisation in column names will slow you down. Luckily, there's an easy way around that - force everything to either upper or lower case. Lower is preferred (as most of `R` is written in lower case) .
+
+```{r makeNamesLower}
+names(oyster) <- tolower(names(oyster))
+```
+
+## Sizing your data (code)
+
+It can often be useful to understand the _dimensions_ of the data you're working with.
+
+By _dimensions_ we mean the number of rows/columns/ that your data is made up of.
+
+In R this is easily accomplished with a couple of commands:
+
+```{r show_sizes, eval = FALSE}
+# Overall dimensions
+dim(oyster)
+
+# Number of columns
+ncol(oyster)
+
+# Number of rows
+nrow(oyster)
+```
+
+## Checks and Summaries
+
+There are two incredibly useful commands in R for getting a quick overview of your data. These are both great ways to spot and then fix things that might slow you down later.
+
+* `str`: prints an overview of your data, including dimensions and data type (class) of each column.
+```{r str, eval=FALSE}
+str(oyster)
+```
+* `summary`: presents a summary of each column, depending on the class of data within it. 
+```{r summary,eval=FALSE}
+summary(oyster)
+```
+
+## Selecting your data
+
+In `R` there a couple of simple ways to grab a subset of your data.
+
+If you want to grab a single column from a table, you can use the `$` operator:
+
+```{r dollar_eg, eval = FALSE}
+# Select all the dates
+oyster$date
+
+# select all the journeys
+oyster$journey.action
+```
+
+## Selecting your data
+
+Or you can use the `data[row(s) , column(s)]` style syntax:
+
+```{r brack_eg, eval = FALSE}
+# Get the first 1 rows
+oyster[1:10, ]
+
+# Get just the first 3 columns
+oyster[ , 1:3]
+```
+
+We could combine these to select very specific subsets of the data:
+
+```{r brack_eg2, eval = FALSE}
+oyster[c(10:20, 30), c(1, 2, 3, 4, 7)]
+```
+
+Or use "negative selection" to take everything _except_ certain rows/columns:
+
+```{r brack_eg3, eval = FALSE}
+oyster[-(1:10), ]
+```
+
+***
+
+Or specify an exact column name in " quotation marks if we know it:
+
+```{r brack_eg4, eval = FALSE}
+oyster[ , "journey.action"]
+```
+
+## A quick note on auto-printing an assignment
+
+If you run any of the commands on the previous couple of slides, you'll see that `R` usually just _prints_ the answer to the console.
+
+By this we mean that it doesn't save that result anywhere. You could write it down, or copy and paste it somewhere, but that's usually not very helpful. In general, unless you want to just "look" at the answer, it's best to _assign_ intermediate results to an `R` object for you to use later:
+
+```{r assign_sub_eg, eval = FALSE}
+subset <- oyster[1:10, ]
+```
+
+## Fixing problems - changing data types (code)
+
+If we want to change the data type of a specific field, we can use a variety of `as.[data_type]` functions to force (_"coerce"_) data to the type we want it. 
+
+We know how to select a single column with `$`, so let's look at how we change the data type:
+```{r as.,eval=FALSE}
+as.character(oyster$credit) # Forces the values to be characters
+as.numeric(oyster$credit)    # Forces the values to be numbers
+```
+
+*** 
+
+We can combine selection and coercion with the assignment operator `<-` to "fix" data in our table:
+```{r as.<-,eval=FALSE}
+oyster$credit <- as.character(oyster$credit) # Change the length to text
+str(oyster)    # Check what we've done
+oyster$credit <- as.numeric(oyster$credit) # Change it back
+```
+
+## Functions and arguments
+
+Most of the commands we seen so far (`read_csv`, `str`, `summary` etc) are `R` _functions_. Just to help with some of the terminology of functions, they generally have the following form.
+
+```
+function_name(argument1, argument2, argument3, ...)
+```
+
+
+The _arguments_ to a function are either the things that the function is applied to (like our data!) or other options that we can set when we use the function.
+
+Sometimes arguments will be optional or have default values. Other times we'll need to explicitly tell R what to do.
+
+***
+
+An example:
+
+```{r read_csv_eg, eval = FALSE}
+read_csv("./data/oyster_all_raw_20160125.csv", col_names = TRUE, skip = 0, col_types = NULL)
+```
+
+Here we have the function `read_csv`. 
+
+The first _argument_ is the file path to the `.csv` file. The second argument tells the function that the file contains column names in the first row. The third argument tells R not to skip any rows when it reads the data, and the fourth argument tells R to guess the data types itself.
+
+## Other summaries
+
+There are a range of other summary functions that we can apply to our data. Here are a few examples:
+
+```{r summaries,eval=FALSE}
+min(data$field)    # Gives the minimum
+mean(data$field)   # Gives the mean
+max(data$field)    # Gives the maximum
+range(data$field)  # Gives the min and max
+unique(data$field) # Gives unique values - similar to SQL "DISTINCT"
+table(data$field)  # Gives a frequency table
+```
+
+Most common descriptive statistics have their own similar function(s), it's just a matter of experimenting or Google-ing to find the one you're looking for.
+
+## Final note - missing values (code)
+
+All languages handle missing values differently. In `R`, missing values are generally represented as `NA`. 
+
+If we run summaries on data containing `NA` then we get an answer of `NA`, e.g.
+```{r NAeg}
+mean(oyster$charge)
+```
+
+We can get around this by adding `na.rm` as an argument to the function:
+```{r NAeg2}
+mean(oyster$charge, na.rm = T)
+```
+
+## A quick look at the data - again
+
+Let's just re-familiarise ourselves with the data again. The data we've seen today:
+
+```{r show_oyster2, echo = FALSE}
+library(knitr)
+oyster %>% tail(5, addrownums = FALSE) %>% kable()
+```
+
+## A quick look at the data - again
+
+The data we haven't seen today:
+
+```{r show_stations2, echo = FALSE}
+library(knitr)
+read.csv("./data/stations.csv") %>% 
+    filter(station %in% c("Richmond", "Canary Wharf", "South Kensington", "Bank",
+                          "Whitechapel", "Algate East")) %>% 
+    head(6) %>% kable()
+```
+
+## Some questions to ask of the data
+
+Now we've seen the data, we can start to come up with some exploratory questions we might ask:
+
+* What are the top 5 journeys?
+* What was the longest journey, how long was it, and when was it?
+* What is the average journey time for each day of the week?
+* What is the average number of journeys per day of the week?
+* Where does Jim live, and what are the coordinates of the station?
+
+In the next sessions we'll start to cover how we can get our data in to a state to answer some of these questions.
+
+## Wrap up
+
+Today we have covered:
+
+* An introduction to R and RStudio;
+* Reading data in to R;
+* Basic checks and summaries on your data; and
+* Some of the terminology that will be helpful for the next couple of sessions.
+
+Next time we will look at data manipulation and aggregation, before covering visualisation in the last session. 
+
+## Things to look at
+
+In preparation for the next session, it might be helpful/interesting (but certainly _not_ essential) to read up on:
+
+* [an introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html);
+* [an overview of lubridate](http://www.r-statistics.com/2012/03/do-more-with-dates-and-times-in-r-with-lubridate-1-1-0/);
+* [anything on R-bloggers](http://www.r-bloggers.com/); and
+* [the efforts I went to to get this data](http://www.thedatagent.com/tflapppart1/)
+
+# Q&A
