@@ -7,3 +7,5 @@
 presentation.html
 # ignore all xlsx files
 *.xlsx
+*.pdf
+*.html
