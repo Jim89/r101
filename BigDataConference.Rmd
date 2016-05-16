@@ -46,9 +46,12 @@ In today's session we'll discuss:
 
 ## Resources:
 
+* __This presentation__ : https://db.tt/1RuSufdb
+
 * __R installation guide__: https://db.tt/4y9HUDFo
-* __This presentation__ : TODO
+
 * __Oyster data__: https://db.tt/81Xpi0LD
+
 * __Stations data__: https://db.tt/jXj2C4eE
 
 ## Why R?
