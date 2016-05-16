@@ -18,7 +18,11 @@ widescreen: true
 
 R is a widely used, open source language for data analysis. 
 
+<br>
+
 It can be easily incorporated into most data-oriented or analytical projects. 
+
+<br>
 
 It can handle pretty much any sort of analysis; the tough thing is often getting your data in to the right shape to do so. 
 
@@ -95,19 +99,19 @@ To help me get an understanding of your level who has:
 3. Seen R code before?
 4. Used Excel for data analysis?
 
-## R Studio | A whistlestop tour
+## R Studio
 
-Today we'll be using the R in the [RStudio](http://www.rstudio.com/) environment. It's the best way to use R, so we'll do a brief overview now.
+I recommend using the R in the [RStudio](http://www.rstudio.com/) environment. It's the best way to use R, so we'll do a brief overview now.
 
 <div class="columns-2">
    <img src="./resources/images/rstudio.png" height="300" width="520">
-   * Console
-   * Scripting/Source
-   * Environment
-   * Files, plots, help, packages
+   <li> Console </li> <br>
+   <li> Scripting/Source </li> <br>
+   <li> Environment </li> <br>
+   <li> Files, plots, help, packages </li>
 </div>
 
-## Advanced useR - scripting
+## Tip - Advanced useR - scripting
 
 The scripting environment in R functions just like a code window in any other language.
 
@@ -169,8 +173,8 @@ R is no exception and there are a wealth of options for getting help:
 ## *How* to ask for help
 
 1. Be explicit
-2. Describe the goal
-3. Provide reproducible examples
+2. Describe the goal 
+3. Provide reproducible examples 
 4. Provide your hardware/software set up.
 
 # Getting Sta-R-ted
@@ -247,7 +251,7 @@ The steps you need to take are:
 2. Use a tool/view the page structure to find out _exactly_ what you're interested in; and
 3. Write some code to access that page and grab what you're interested in.
 
-I won't go in to detail today, but I wrote a blog post about doing that on my blog [here](http://www.thedatagent.com/tflapppart1/).
+I won't go in to detail today, but I wrote a post about doing that on my blog [here](http://www.thedatagent.com/tflapppart1/).
 
 ## Reading data from anywhere
 
@@ -445,11 +449,13 @@ I won't be covering a detailed overview of these packages today, but if you're i
 </footer>
 </blockquote>
 <br>
-When making transformations, try to _add_ new fields to your data, don't change existing ones. This makes it easier to have a trail of what has happened to the data, and avoids losing track of what is raw data, and what is transformed data. 
+When making transformations, try to _add_ new fields to your data, don't change existing ones. 
+
+This makes it easier to have a trail of what has happened to the data, and avoids losing track of what is raw data, and what is transformed data. 
 
 ## dplyr - Adding variables
 
-With dplyr we can add variables to a data set using the `mutate` verb.
+With dplyr we can add variables to a data set using the `mutate` function.
 
 ```{r dplyrMutate, eval=FALSE}
 mutate([data], [some_new_field]) # general form
@@ -565,7 +571,7 @@ oyster <- mutate(oyster,
                   to.clean = str_trim(gsub(regex, "", to)))
 ```
 
-Note the `str_trim` function. It's from the `stringr` package and just trims excess whitespace from the start and end of a string.
+Note the `str_trim` function. It's from the `stringr` package and just trims excess white-space from the start and end of a string.
 
 ## Combining data
 
@@ -590,18 +596,22 @@ There is some excellent reference material to help you understand joins which yo
 We are now ready to join our data sets together. 
 
 ```{r lj_1, eval = TRUE}
-oyster <- left_join(oyster , stations, by = c("from.clean" = "station")) %>% 
-          rename(from.long = long,
+oyster <- left_join(oyster , stations, by = c("from.clean" = "station"))
+oyster <- rename(oyster, 
+                 from.long = long,
                  from.lat = lat)
 ```
 
 But we've got two stations to join, so we'll have to do it twice.
 
 ```{r lj_2, eval = TRUE}
-oyster <- left_join(oyster, stations, by = c("to.clean" = "station")) %>% 
-          rename(to.long = long,
+oyster <- left_join(oyster, stations, by = c("to.clean" = "station"))
+oyster <- rename(oyster,
+                 to.long = long,
                  to.lat = lat)
 ```
+
+The `rename` function is also from `dplyr` and renames columns.
 
 # Step 4 | Perform your analysis
 
@@ -613,17 +623,18 @@ After dealing with the detail of the data, it's worth taking a step back to revi
 
 What were you interested in at the beginning, and what analyses will deal with those interests? 
 
-In short, try not to lose sight of what you set out to do in the first place. 
+What have you seen in your intermediate steps that looks interesting, what might you add to your analysis?
+
+Explore new options, but try not to lose sight of what you set out to do in the first place. 
 
 ## Journey times
 
 `dplyr` is great for performing summaries and simple analyses, such as looking at just how much time I waste travelling across London:
 ```{r jim_jt_show, eval = FALSE}
-oyster %>% 
-group_by(journey.action) %>% 
-summarise(trips = n(),
-          avg_time = mean(as.numeric(journey.time), na.rm = TRUE)) %>% 
-arrange(-trips) 
+oyster_summary <- group_by(oyster, journey.action)
+oyster_summary <- summarise(oyster_summary, trips = n(),
+                            avg_time = mean(as.numeric(journey.time)) 
+oyster_summary <- arrange(oyster_summary, desc(trips))
 ```
 
 ```{r jim_journey_time_show, eval=TRUE, echo = FALSE}
@@ -643,6 +654,8 @@ After spending time with the data, and answering your initial questions, its tim
 
 This might mean dropping the analysis all together if your initial results were (in)conclusive. Or it may mean building more sophisticated and complex models to help answer deeper questions.
 
+For example, we might be interested in understanding the network structure of all my journeys.
+
 For us, for now, this will do, and we'll move on to...
 
 # Step 5 | Visualise
@@ -653,7 +666,7 @@ Knowing how to make a pretty chart is one thing, but knowing _which_ pretty char
 
 An essential skill in visualisation is picking the appropriate chart type for your data, and for your audience.
 
-Complex visuals may show your answer, but if they baffle the viewier, or take too much time to understand, then it's worth moving to something simpler, or adding pointers on how to read your chart.
+Complex visuals may show your answer, but if they baffle the viewer, or take too much time to understand, then it's worth moving to something simpler, or adding pointers on how to read your chart.
 
 ## A grammar of graphics
 
@@ -686,7 +699,7 @@ We can also perform some analysis with visualisations, too.
 
 For example, we can think of the journeys as a network, and chart that out using the `networkD3` package in R.
 
-## Networks
+## Networks {.flexbox .vcenter}
 
 ```{r networkD3, echo = FALSE, message = FALSE}
 library(networkD3)
@@ -716,7 +729,9 @@ forceNetwork(Links = nw$links,
              opacity = 1,
              legend = F,
              bounded = F,
-             zoom = TRUE)
+             zoom = TRUE,
+             height = 550,
+             width = 1000)
 ```
 
 # Step 6 | Communicate your findings
