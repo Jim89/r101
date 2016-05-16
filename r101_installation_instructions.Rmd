@@ -11,7 +11,7 @@ There are two things you need to get started with R. These are:
 ## R
 
 1. Download R directly from CRAN [here](https://cran.rstudio.com/) (CRAN is the "Comprehensive R Archive Network").
-2. Choose your operating system and download the most up-to-date version that is available. As of 2015-01-25 that's 3.2.3.
+2. Choose your operating system and download the most up-to-date version that is available. As of 2016-05-15 that's 3.3.0.
 3. Install R on your system. If you're running a modern computer (less than 5 years old) you're probably safe to install the 64-bit version. If you have a very old laptop, it's probably best to install the 32-bit version. (Note that 32/64-bit is an option in the installer once you launch it).
 
 ## R-Studio
