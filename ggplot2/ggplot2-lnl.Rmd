@@ -8,6 +8,7 @@ output: ioslides_presentation
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
 ```
 
 ## Why a grammar? {.centered}
@@ -23,15 +24,25 @@ knitr::opts_chunk$set(echo = FALSE)
 * A grammar provides the ability to understand even complex graphs. It also helps us
 to understand which charts are well formed.
     * Good grammar is just the first step to a good sentence!
+    
+> This grammar is useful for both the user and the developer of statistical graphics. For
+the user, it makes it easier to iteratively update a plot, changing a single feature at a time.
+The grammar is also useful because it suggests the high-level aspects of a plot that
+can be changed, giving us a framework to think about graphics, and hopefully shortening the dis-
+tance from mind to paper. It also encourages the use of graphics customized to a particular
+problem rather than relying on generic named graphics.    
+
 </div>
 
-## The basic elements
+## The basic elements {.build}
 
 There are three basic elements of a plot:
 
 <img src="./resources/basic-elements.png" height="350" width="900" style="margin:0px auto;display:block">
 
 <div class="notes">
+What are they?
+
 There are 3 basic elements to a plot:
 
 1. Data: used to make the plot. Typically rows and columns (but not always)
@@ -45,8 +56,76 @@ There are 3 basic elements to a plot:
 
 Map variables in the data to the visual properties of the geom: the __aesthetics__.
 
-<img src="./resources/basic-mapping.png" height="400" width="900" style="margin:0px auto;display:block">
+<img src="./resources/basic-mapping.png" height="350" width="900" style="margin:0px auto;display:block">
 
+<div class="notes">
+To create a basic plot, we take elements of the data, and _map_ them to aesthetics.
 
+This _translates_ our data into the visual marks present in the data.
+
+It sounds a little obvious at first, but it is important to understand the basic principles at work
+
+Understanding what sorts of data can be mapped to what sorts of aesthetics is crucial for building effective visualisations
+</div>
+
+## A simple example
+
+We want a graph of A vs. C, with points representing D, ignoring B.
+
+```{r}
+df <- data.frame(A = c(2, 1, 4, 9),
+                 B = c(3, 2, 5, 10), 
+                 C = c(4, 1, 15, 10),
+                 D = c("a", "a", "b", "b"))
+knitr::kable(df, align = rep("c", 4))
+```
+
+<div class="notes">
+What is our data? (Easy)
+What is the geom we want?
+What are the coordinates? Answer: cartesian (gloss over)
+
+What do we map to what?
+
+At its most basic we need to map:
+
+* A to the x-position aes
+* C to the y-position aes
+* D to the shape aes
+</div>
+
+## A simple example {.centered}
+
+```{r fig.align = 'centre'}
+qplot(data = df, x = A, y = C, shape = D, geom = "point", size = I(5))
+```
+
+# Graphic Layers
+
+## Building in layers
+
+* Data
+
+<br>
+
+* Mappings
+
+<br>
+
+* Transformations
+
+<br>
+
+* Geometric objects
+
+<div class="notes">
+* Transformations = both statistical transformations, _and_ those into coordinate system
+
+* Together, these four components form a 'layer'
+
+* The simple example graph contains just one layer, but plots can have many layers (e.g. the first example)
+
+More detail...
+</div>
 
 
