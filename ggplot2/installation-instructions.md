@@ -1,3 +1,9 @@
+---
+output:
+  word_document: default
+  html_document:
+    theme: readable
+---
 # R, RStudio & ggplot2 installation
 
 In order to get up and running with `R` and `ggplot2` you'll need to install three things to your laptop:
@@ -68,7 +74,7 @@ The `>` prompt is where you can enter `R` commands. Type in the following comman
 > install.packages("ggplot2")
 ```
 
-You may get a pop-up saying something about the default library location being unaccessible, and asking you if you want to use a local library. If you do get this popup, select 'yes'. `R` should now install the `ggplot2` onto your local system (you should see some output in the console as it does this). Once it's finished enter the following at the console:
+You may get a pop-up saying something about the default library location being inaccessible, and asking you if you want to use a local library. If you do get this popup, select 'yes'. `R` should now install the `ggplot2` onto your local system (you should see some output in the console as it does this). Once it's finished enter the following at the console:
 
 ```
 > library(ggplot2)
