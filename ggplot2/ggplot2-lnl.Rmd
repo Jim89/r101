@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
 ```
 
-# The grammar of graphics
+# The grammar of graphics | A framework for constructing visualisations
 
 ## Why a grammar? {.centered}
 
@@ -38,7 +38,7 @@ problem rather than relying on generic named graphics.
 
 </div>
 
-## The basic elements {.build}
+## Basic elements {.build}
 
 There are three basic elements of a plot:
 
@@ -56,7 +56,7 @@ There are 3 basic elements to a plot:
 </div>
 
 
-## Displaying data in a plot
+## Displaying data
 
 Map variables in the data to the visual properties of the geom: the __aesthetics__.
 
@@ -104,9 +104,9 @@ At its most basic we need to map:
 qplot(data = df, x = A, y = C, shape = D, geom = "point", size = I(5))
 ```
 
-# Layers of visualisation
+# Constructing Graphics | A layered grammar
 
-## Building in layers
+## Layered components
 
 * Data
 
@@ -153,13 +153,15 @@ We also need to decide which variables to map to which aethetics, e.g. carat to 
 
 ## Statistical transformations
 
-Usually perform some form of summarisation of the data.
+Usually perform some type of summarisation of the data.
 
 ```{r, fig.align='center', fig.width=10, fig.height=4}
 qplot(data = diamonds, x = price, bins = 30, colour = I("white"))
 ```
 
 <div class="notes">
+Here, we have performed a stat. transformation and mapped the results onto the x-positon and the y-position aesthetics.
+
 There are many stats that we can use to transform the data:
 * bins (i.e. histogram)
 * boxplots
@@ -170,7 +172,7 @@ A stat takes data as input and returns data as output. It may create completely 
 
 ## Geoms
 
-Control the type of plot created.
+Control the _type_ of plot created.
 
 ```{r, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F, cache=T}
 points <- qplot(data = diamonds, x = carat, y = price, geom = "point", colour = cut, alpha = I(0.5))
@@ -190,7 +192,7 @@ cowplot::plot_grid(points, smoothed, nrow = 2, ncol = 1)
 * Not all geoms can display all aesthetics, e.g. point has position, colour, shape, size, whereas bars have position, height, width, fill.
 </div>
 
-## Final notes - scales
+## Other elements - scales
 
 Scales control the mapping from data to aesthetics.
 
@@ -206,7 +208,7 @@ Scales control the mapping from data to aesthetics.
 * We use scales to _control_ the mapping and affect our plot.
 </div>
 
-## Final notes - position
+## Other elements - position
 
 Tweaking the position of geometric elements changes the message.
 
@@ -221,15 +223,105 @@ cowplot::plot_grid(stacked, dodged)
 * However it can also change the message of the plot, on the left we see how many total diamonds there are of each cut, on the right this is harder to see
 </div>
 
-## Final notes - facets
+## Other elements - facets
 
-Create small multiples for different subsets of an entire dataset
+Create small multiples for different subsets of a dataset.
 
 ```{r fig.align='center', fig.width=10, fig.height=4, warning = F, message = F}
 qplot(data = diamonds, geom = "bar", x = cut, fill = color, facets = ~color)
 ```
 
-# ggplot2 | Implementing the grammar
+<div class="notes">
+* Facets are sufficiently useful that they should be included in this general framework
+* Facets display the same plots across categories in the data.
+* They're useful to understand from a grammar perspective to: we can map a categorical variable to facets, so we can almost think of them as another aesthetic
+* Facets are useful as they allow us to assess both _within_ and _across_ group differences
+</div>
+
+# ggplot2 | Implementing the grammar in R
+
+## Diamonds data
+
+`diamonds` is data that comes with `ggplot2`. 
+
+```{r echo = T}
+diamonds
+```
+
+<div class="notes">
+* Type `diamonds` into the console to see the first few records
+
+* We'll use this data to make some example visualisations
+</div>
+
+## qplot
+
+Used to create quick visualisations with a simple syntax.
+
+```{r echo = T, eval = F}
+qplot(x = variable1, y = NULL, ..., data = your_dataset)
+```
+
+<div class="notes">
+* `qplot` is really useful for creating _quick_ plots.
+
+* All you _need_ to specify is a variable to map to the x-position, and a dataset: the other elements of the grammar are optional.
+
+* A y-variable is optional, as are the other elements of the grammar we have discussed:
+    * `qplot` is sensible enough to chose a geom for us, based on the type of data we give it
+
+* What do we need to do in order to create a histogram of diamond price?
+    * N.B. we don't need to specify a stat. or a geom for `qplot`
+
+* Have a go at creating a histogram of price, using the diamonds data set.
+</div>
+
+## Histogram of price
+
+```{r echo = T, fig.align='center', fig.width=10, fig.height=4, message = FALSE}
+qplot(x = price, data = diamonds)
+```
+
+
+## Some examples {.centered}
+
+[TODO work examples]
+
+## Some examples {.centered}
+
+[TODO work examples]
 
 ## Some examples
 
+<img src="./resources/bike-ggplot.png" height="400" width="800" style="margin:0px auto;display:block">
+
+[Source](http://spatial.ly/2012/02/great-maps-ggplot2/)
+
+## Some examples
+
+<img src="./resources/facebook-graph.png" height="400" width="1000" style="margin:0px auto;display:block">
+
+[Source](https://www.facebook.com/notes/facebook-engineering/visualizing-friendships/469716398919)
+
+# Recap | And next steps
+
+## A grammar of graphics
+
+## Components of the layered grammar
+
+1. Data
+2. Mappings
+3. Statistical transformations
+4. Geoms
+5. Other elements:
+    * Scales
+    * Position
+    * Facets
+
+## ggplot2
+
+## Next steps
+
+[TODO list of resources]
+
+# Thank you | Questions?
