@@ -1,0 +1,52 @@
+---
+title: "The grammar of graphics"
+subtitle: "And an implementation in ggplot2"
+author: "Jim Leach"
+date: "9 January 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Why a grammar? {.centered}
+
+<img src="./resources/weather-example.png" height="450" width="1000">
+
+<div class="notes">
+* Look for 30 seconds. Describe this graph to me in as few words as possible.
+    * Is it a line graph? A bar chart? What is it?
+* As it was described, would you be able to re-create it?
+* Grammar: “the fundamental principles or rules of an art or science” (OED)
+* If we develop a grammar, we could answer these questions (although this chart it slightly complex).
+* A grammar provides the ability to understand even complex graphs. It also helps us
+to understand which charts are well formed.
+    * Good grammar is just the first step to a good sentence!
+</div>
+
+## The basic elements
+
+There are three basic elements of a plot:
+
+<img src="./resources/basic-elements.png" height="350" width="900" style="margin:0px auto;display:block">
+
+<div class="notes">
+There are 3 basic elements to a plot:
+
+1. Data: used to make the plot. Typically rows and columns (but not always)
+2. Geoms: the visual, geometric objects that are used to represent the data
+3. Coordinate system: onto which we place the geoms
+    * Typically cartesian for us (XY plane) but could be something more complex
+</div>
+
+
+## Displaying data in a plot
+
+Map variables in the data to the visual properties of the geom: the __aesthetics__.
+
+<img src="./resources/basic-mapping.png" height="400" width="900" style="margin:0px auto;display:block">
+
+
+
+
