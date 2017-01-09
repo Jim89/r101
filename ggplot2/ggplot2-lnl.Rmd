@@ -192,6 +192,21 @@ cowplot::plot_grid(points, smoothed, nrow = 2, ncol = 1)
 * Not all geoms can display all aesthetics, e.g. point has position, colour, shape, size, whereas bars have position, height, width, fill.
 </div>
 
+## Other elements - facets
+
+Create small multiples for different subsets of a dataset.
+
+```{r fig.align='center', fig.width=10, fig.height=4, warning = F, message = F}
+qplot(data = diamonds, geom = "bar", x = cut, fill = color, facets = ~color)
+```
+
+<div class="notes">
+* Facets are sufficiently useful that they should be included in this general framework
+* Facets display the same plots across categories in the data.
+* They're useful to understand from a grammar perspective to: we can map a categorical variable to facets, so we can almost think of them as another aesthetic
+* Facets are useful as they allow us to assess both _within_ and _across_ group differences
+</div>
+
 ## Other elements - scales
 
 Scales control the mapping from data to aesthetics.
@@ -223,26 +238,23 @@ cowplot::plot_grid(stacked, dodged)
 * However it can also change the message of the plot, on the left we see how many total diamonds there are of each cut, on the right this is harder to see
 </div>
 
-## Other elements - facets
-
-Create small multiples for different subsets of a dataset.
-
-```{r fig.align='center', fig.width=10, fig.height=4, warning = F, message = F}
-qplot(data = diamonds, geom = "bar", x = cut, fill = color, facets = ~color)
-```
-
-<div class="notes">
-* Facets are sufficiently useful that they should be included in this general framework
-* Facets display the same plots across categories in the data.
-* They're useful to understand from a grammar perspective to: we can map a categorical variable to facets, so we can almost think of them as another aesthetic
-* Facets are useful as they allow us to assess both _within_ and _across_ group differences
-</div>
-
 # ggplot2 | Implementing the grammar in R
+
+## What is `ggplot2`
+
+* Hugely popular `R` package for data visualisation
+
+<br>
+
+* Implements the grammar of graphics
+
+<br>
+
+* Declarative DSL for visualisation
 
 ## Diamonds data
 
-`diamonds` is data that comes with `ggplot2`. 
+`diamonds` is a data set that comes with `ggplot2`. 
 
 ```{r echo = T}
 diamonds
@@ -262,8 +274,12 @@ Used to create quick visualisations with a simple syntax.
 qplot(x = variable1, y = NULL, ..., data = your_dataset)
 ```
 
+* Enter `?qplot` in the console to pull up the help page.
+
+* We can use it to specify the _data_, _mappings_, and _geoms_ for a visualisation.
+
 <div class="notes">
-* `qplot` is really useful for creating _quick_ plots.
+* `qplot` is really useful for creating _quick_ plots. More complex plots (e.g. with stat transforms) need to use full `ggplot()` syntax.
 
 * All you _need_ to specify is a variable to map to the x-position, and a dataset: the other elements of the grammar are optional.
 
@@ -282,6 +298,69 @@ qplot(x = variable1, y = NULL, ..., data = your_dataset)
 qplot(x = price, data = diamonds)
 ```
 
+<div class="notes">
+* Now we want a plot of diamond price vs. carat, coloured by cut, with _points_
+
+* What do we need to map to what?
+    * N.B. don't _need_ to specify geom
+</div>
+
+## Carat vs. price - points
+
+```{r, echo = T, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F}
+qplot(x = carat, y = price, colour = cut, data = diamonds)
+```
+
+<div class="notes">
+* Now we want a plot of diamond price vs. carat, coloured by cut, with _smoothers_
+
+* What do we need to map to what?
+</div>
+
+## Carat vs. price - smoother
+
+```{r, echo = T, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F, cache=T}
+qplot(x = carat, y = price, geom = "smooth", colour = cut, data = diamonds)
+```
+
+<div class="notes">
+* Now we want a plot of diamond price vs. carat, uncoloured, but with points and a smoother
+
+* What do we need to map to what?
+</div>
+
+## Carat vs. price - points AND smoother
+
+```{r, echo = T, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F, cache=T}
+qplot(x = carat, y = price, geom = c("point", "smooth"), data = diamonds)
+```
+
+<div class="notes">
+* But what if we want to _set_ an aesthetic rather than _map_ data to it?
+
+* With "normal" `ggplot` it's easy, with `qplot` we need to wrap the value in the identity function `I()`
+</div>
+
+## Carat vs. price - points with set alpha and colour
+
+_Alpha_ is transparency. A list of `R` colours is [here](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf).
+
+```{r, echo = T, fig.align='center', fig.width=10, fig.height=3.5, message = F, warning = F, cache=T}
+qplot(x = carat, y = price, data = diamonds, alpha = I(0.15), colour = I("steelblue"))
+```
+
+<div class="notes">
+* Finally, lets create another histogram of price, facetted _AND_ filled by cut, with white lines around the bars.
+
+* What do we need to map to what?
+</div>
+
+## Histogram of price - facetted by cut
+
+```{r echo = T, fig.align='center', fig.width=10, fig.height=4, message = FALSE}
+qplot(x = price, facets = ~cut, fill = cut, data = diamonds, colour = I("white"))
+```
+
 
 ## Some examples {.centered}
 
@@ -290,6 +369,10 @@ qplot(x = price, data = diamonds)
 ## Some examples {.centered}
 
 [TODO work examples]
+
+## Some examples {.centered}
+
+[TODO Hadley example]
 
 ## Some examples
 
@@ -322,6 +405,15 @@ qplot(x = price, data = diamonds)
 
 ## Next steps
 
-[TODO list of resources]
+* R for Data Science (Wickham & Grolemund, 2016), Chapter 3 - Data Visualisation. [Link](http://r4ds.had.co.nz/data-visualisation.html)
+* R for Data Science (Wickham & Grolemund, 2016), Chapter 28 - Graphics for Communication. [Link](http://r4ds.had.co.nz/graphics-for-communication.html)
+* Data Visualisation with ggplot2 (Datacamp online course). [Link](https://www.datacamp.com/courses/data-visualization-with-ggplot2-1)
+* R Graphics Cookbook (Chang, 2013). [Link](https://www.amazon.com/dp/1449316956/ref=as_li_ss_tl?&linkCode=sl1&tag=ggplot2-20&linkId=4daa45d4fbd0a187163a6ff9d56d986e)
+* ggplot2: Elegant graphics for data analysis 2nd ed. (Wickham, 2016). [Link](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=as_li_ss_tl?ie=UTF8&linkCode=sl1&tag=ggplot2-20&linkId=4b4de5146fdafd09b8035e8aa656f300)
+* Upcoming course TODO
+
+## Final note
+
+TODO some quotation
 
 # Thank you | Questions?
