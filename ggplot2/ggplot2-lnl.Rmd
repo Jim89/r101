@@ -3,7 +3,9 @@ title: "The grammar of graphics"
 subtitle: "And an implementation in ggplot2"
 author: "Jim Leach"
 date: "9 January 2017"
-output: ioslides_presentation
+output: 
+  ioslides_presentation:
+    widescreen: true
 ---
 
 ```{r setup, include=FALSE}
@@ -100,7 +102,7 @@ At its most basic we need to map:
 qplot(data = df, x = A, y = C, shape = D, geom = "point", size = I(5))
 ```
 
-# Graphic Layers
+# Layers of visualisation
 
 ## Building in layers
 
@@ -112,20 +114,82 @@ qplot(data = df, x = A, y = C, shape = D, geom = "point", size = I(5))
 
 <br>
 
-* Transformations
+* Statistical transformations
 
 <br>
 
 * Geometric objects
 
 <div class="notes">
-* Transformations = both statistical transformations, _and_ those into coordinate system
+* Stat. trans may not be necessary
 
 * Together, these four components form a 'layer'
 
 * The simple example graph contains just one layer, but plots can have many layers (e.g. the first example)
 
+* Typically all layers on a plot show different views of the same data, e.g. a scatterplot with a smoother
+
 More detail...
 </div>
 
 
+## Data & mappings
+
+Convert an abstract graphic into a concrete plot.
+
+```{r}
+knitr::kable(head(diamonds))
+```
+
+<div class="notes">
+In the grammar of graphics, data are actually independant of a plot: we can specify all the elements of a plot without any data, and apply this abstract graphic to many data.
+
+The addition of data simply converts this abstract _graphic_ into a concrete _plot_.
+
+We also need to decide which variables to map to which aethetics, e.g. carat to x-pos, price to y-pos, cut to colour.
+</div>
+
+## Statistical transformations
+
+Usually perform some form of summarisation of the data.
+
+```{r, fig.align='center', fig.width=10, fig.height=4}
+qplot(data = diamonds, x = price, bins = 30, colour = I("white"))
+```
+
+<div class="notes">
+There are many stats that we can use to transform the data:
+* bins (i.e. histogram)
+* boxplots
+* smoothers
+
+A stat takes data as input and returns data as output. It may create completely transform the data, or just create new variables which themselves can be mapped to aesthetics.
+</div>
+
+## Geoms
+
+Control the type of plot created.
+
+```{r, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F}
+points <- qplot(data = diamonds, x = carat, y = price, geom = "point", colour = cut, alpha = I(0.5))
+smoothed <- qplot(data = diamonds, x = carat, y = price, geom = "smooth", colour = cut)
+cowplot::plot_grid(points, smoothed, nrow = 2, ncol = 1)
+```
+
+<div class="notes">
+Geoms control what sort of plot we see. They are the visual marks that data are represented as in the graphic.
+
+Geoms are thought of based on their dimensionality, and of the data which they can be applied to:
+* 1d: histograms, densities, bars (for discrete data)
+* 2d:
+    * 2xcontinuous: points, smooths
+    * 1 cont, 1 discrete: bars/columns, boxplots
+    * 2x discrete: counts
+    * continous functions: lines
+    * maps
+    * error bars
+    
+We've just seen a 1-dimensional plot previously (the histogram). Here we have two plots which are identical apart from the geom we specified. They show the _same_ information, but in a different way because we used a different geom.
+</div>
+
+## 
