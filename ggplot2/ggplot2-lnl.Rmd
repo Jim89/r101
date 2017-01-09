@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
 ```
 
+# The grammar of graphics
+
 ## Why a grammar? {.centered}
 
 <img src="./resources/weather-example.png" height="450" width="1000">
@@ -170,26 +172,64 @@ A stat takes data as input and returns data as output. It may create completely 
 
 Control the type of plot created.
 
-```{r, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F}
+```{r, fig.align='center', fig.width=10, fig.height=4, message = F, warning = F, cache=T}
 points <- qplot(data = diamonds, x = carat, y = price, geom = "point", colour = cut, alpha = I(0.5))
 smoothed <- qplot(data = diamonds, x = carat, y = price, geom = "smooth", colour = cut)
 cowplot::plot_grid(points, smoothed, nrow = 2, ncol = 1)
 ```
 
 <div class="notes">
-Geoms control what sort of plot we see. They are the visual marks that data are represented as in the graphic.
-
-Geoms are thought of based on their dimensionality, and of the data which they can be applied to:
-* 1d: histograms, densities, bars (for discrete data)
-* 2d:
-    * 2xcontinuous: points, smooths
-    * 1 cont, 1 discrete: bars/columns, boxplots
-    * 2x discrete: counts
-    * continous functions: lines
-    * maps
-    * error bars
-    
-We've just seen a 1-dimensional plot previously (the histogram). Here we have two plots which are identical apart from the geom we specified. They show the _same_ information, but in a different way because we used a different geom.
+* Geoms control what sort of plot we see. They are the visual marks that data are represented as in the graphic.
+* Geoms are thought of based on their dimensionality, and of the data which they can be applied to:
+    * 1d: bars (histograms), densities, bars (for discrete data)
+    * 2d: points, smooths, bars/columns, boxplots, lines, maps
+* We've just seen a 1-dimensional plot previously (the histogram). Here we have two plots which are identical apart from the geom we specified. They show the _same_ information, but in a different way because we used a different geom.
+* Geoms are abstract and can be rendered in different ways. e.g. an interval can be represented as a box, a line, an error bar, ...
+* Geoms are mostly general purpose, but some require specific output from a statistic (e.g. a boxplot).
+* Every geom has a default statistic, and vice versa (e.g. bins default to bars)
+* Not all geoms can display all aesthetics, e.g. point has position, colour, shape, size, whereas bars have position, height, width, fill.
 </div>
 
-## 
+## Final notes - scales
+
+Scales control the mapping from data to aesthetics.
+
+<img src="./resources/scales.png" height="350" width="900" style="margin:0px auto;display:block">
+
+<div class="notes">
+* Because scales control our mapping, we need one scale for each aesthetic used in each layer.
+* Scales are common across layers to ensure a consisten mapping from data to aesthetics.
+* Here we see examples legends of data mapped to different scales:
+    * The left 2 show a continuous variable mapped to size and colour
+    * The right 2 show a discrete variable mapped to shape and colour
+* Typically scales relate to a single mapping from variable to aesthetic, e.g. X to shape, Y to colour, Z to size
+* We use scales to _control_ the mapping and affect our plot.
+</div>
+
+## Final notes - position
+
+Tweaking the position of geometric elements changes the message.
+
+```{r fig.align='center', fig.width=10, fig.height=4, warning = F, message = F}
+dodged <- ggplot(diamonds) + geom_bar(aes(cut, fill = color), position = "dodge")
+stacked <- ggplot(diamonds) + geom_bar(aes(cut, fill = color))
+cowplot::plot_grid(stacked, dodged)
+```
+<div class="notes">
+* Position is often used to aid clarity in a plot.
+* E.g. a scatter plot with few unique X/Y combinations may be better with jitter
+* However it can also change the message of the plot, on the left we see how many total diamonds there are of each cut, on the right this is harder to see
+</div>
+
+## Final notes - facets
+
+Create small multiples for different subsets of an entire dataset
+
+```{r fig.align='center', fig.width=10, fig.height=4, warning = F, message = F}
+qplot(data = diamonds, geom = "bar", x = cut, fill = color, facets = ~color)
+```
+
+# ggplot2 | Implementing the grammar
+
+## Some examples
+
